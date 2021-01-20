@@ -12,11 +12,13 @@ yarn run android
 ## 주요 라이브러리 및 프레임워크
 
 - React Native
-- ![react-navigation v5](https://github.com/react-navigation)
-- ![styled-components](https://github.com/styled-components/styled-components)
-- ![MobX 6](https://github.com/mobxjs/mobx)
+- [react-navigation v5](https://github.com/react-navigation)
+- [styled-components](https://github.com/styled-components/styled-components)
+- [MobX 6](https://github.com/mobxjs/mobx)
   - 데코레이터 문법은 사용하지 않는다.
-- ![mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite)
+- [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite)
+- [react-native-config](https://github.com/luggit/react-native-config
+- [react-native-naver-map](https://github.com/QuadFlask/react-native-naver-map)
 
 ## 팁
 
