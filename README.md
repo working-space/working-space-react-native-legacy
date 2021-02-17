@@ -13,7 +13,7 @@ yarn run android
 
 - React Native
 - [react-navigation v5](https://github.com/react-navigation)
-- [styled-components](https://github.com/styled-components/styled-components)
+- [Emotion](https://emotion.sh/docs/introduction)
 - [MobX 6](https://github.com/mobxjs/mobx)
   - 데코레이터 문법은 사용하지 않는다.
 - [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite)
