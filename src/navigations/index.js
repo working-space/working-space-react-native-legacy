@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { observer } from 'mobx-react-lite';
 import useStore from '~/hooks/useStore';
 import LoginNavigator from '~/navigations/LoginNavigator';
-import MainNavigator from '~/navigations/MainNavigator';
+import DrawerNavigator from '~/navigations/DrawerNavigator';
 
 const Navigator = () => {
   const { AuthStore } = useStore();
@@ -11,7 +11,7 @@ const Navigator = () => {
 
   return (
     <NavigationContainer>
-      {isLoggedIn ? <MainNavigator /> : <LoginNavigator />}
+      {isLoggedIn ? <DrawerNavigator /> : <LoginNavigator />}
     </NavigationContainer>
   );
 };
