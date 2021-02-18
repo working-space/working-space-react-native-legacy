@@ -26,6 +26,9 @@ const CafeListItem = (props) => {
       </Item.Header>
       <Item.Address>{address}</Item.Address>
       <Item.TagList>
+        {
+          // TODO: tags props 배열에 따라서 태그 리스트가 render 되도록 수정 필요
+        }
         <Item.Tag>
           <Item.TagIcon>{TAG.CONCENT.icon}</Item.TagIcon>
           <Item.TagName>{TAG.CONCENT.name}</Item.TagName>
