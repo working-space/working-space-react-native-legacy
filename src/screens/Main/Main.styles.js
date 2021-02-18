@@ -2,6 +2,7 @@ import styled from '@emotion/native';
 
 export const Container = styled.View`
   flex: 1;
+  background-color: #ffffff;
 `;
 
 export const SearchInput = styled.TextInput`
@@ -21,12 +22,4 @@ export const HeaderText = styled.Text`
 
 export const CafeListContainer = styled.View`
   margin: 24px 16px;
-`;
-
-export const CafeListItem = styled.View`
-  position: relative;
-  width: 100%;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  padding: 16px;
 `;
