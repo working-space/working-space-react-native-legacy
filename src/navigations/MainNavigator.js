@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import Main from '~/screens/Main/Main';
 import Map from '~/screens/Map/Map';
+import Search from '~/screens/Search/Search';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,15 @@ const MainNavigator = () => {
         component={Main}
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Search"
+        component={Search}
+        options={{
+          headerShown: false,
+          headerBackTitleVisible: false,
+          animationEnabled: false,
         }}
       />
       <Stack.Screen

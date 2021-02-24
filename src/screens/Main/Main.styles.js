@@ -7,12 +7,18 @@ export const Container = styled.View`
   z-index: 1;
 `;
 
-export const SearchInput = styled.TextInput`
+export const SearchInput = styled.TouchableOpacity`
   height: 40px;
   border: 1px solid #cccccc;
   border-radius: 20px;
-  padding: 0 12px;
+  padding: 12px;
   margin: 0 16px;
+  justify-content: center;
+`;
+
+SearchInput.PlaceHolder = styled.Text`
+  font-size: 14px;
+  color: #a7a7a7;
 `;
 
 export const HeaderText = styled.Text`
