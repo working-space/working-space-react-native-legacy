@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { View } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, FlatList } from 'react-native';
 import { css } from '@emotion/native';
 import { Item } from './CafeListItem.styles';
 import TAG from '~/constants/tag';
@@ -17,44 +17,25 @@ const CafeListItem = (props) => {
     commentCount,
   } = props.data;
 
-  const renderTagListItems = useCallback(() => {
+  const [tagList, setTagList] = useState([]);
+
+  const getTagList = useCallback(() => {
     const CUT_LINE = 2;
 
     const displayTags = tags.slice(0, CUT_LINE);
     const hiddenTagCount = tags.slice(CUT_LINE).length;
-
-    let result = displayTags.map((tag, index) => (
-      <View
-        key={`${tag}`}
-        style={css`
-          flex-direction: row;
-          align-items: center;
-        `}>
-        {index !== 0 && <Item.TagBoundary />}
-        <Item.Tag>
-          <Item.TagIcon>{TAG[tag].icon}</Item.TagIcon>
-          <Item.TagName>{TAG[tag].name}</Item.TagName>
-        </Item.Tag>
-      </View>
-    ));
+    let result = displayTags.map((tag) => TAG[tag]);
 
     if (hiddenTagCount > 0) {
-      result = [
-        ...result,
-        <View
-          key={`${hiddenTagCount}`}
-          style={css`
-            flex-direction: row;
-            align-items: center;
-          `}>
-          <Item.TagBoundary />
-          <Item.TagName>+{hiddenTagCount}</Item.TagName>
-        </View>,
-      ];
+      result = [...result, { name: `+${hiddenTagCount}` }];
     }
 
-    return result;
+    setTagList(result);
   }, [tags]);
+
+  useEffect(() => {
+    getTagList();
+  }, [getTagList]);
 
   return (
     <Item>
@@ -66,7 +47,27 @@ const CafeListItem = (props) => {
         </Item.HeaderRight>
       </Item.Header>
       <Item.Address>{address}</Item.Address>
-      <Item.TagList>{renderTagListItems()}</Item.TagList>
+      <FlatList
+        contentContainerStyle={css`
+          justify-content: center;
+          margin-left: -2px;
+          margin-bottom: 24px;
+        `}
+        horizontal
+        scrollEnabled={false}
+        ItemSeparatorComponent={() => (
+          <Item.TagSeparatorContainer>
+            <Item.TagSeparator />
+          </Item.TagSeparatorContainer>
+        )}
+        data={tagList}
+        renderItem={({ item }) => (
+          <Item.Tag>
+            {item.icon && <Item.TagIcon>{item.icon}</Item.TagIcon>}
+            <Item.TagName>{item.name}</Item.TagName>
+          </Item.Tag>
+        )}
+      />
       <Item.InfoList>
         <Item.Info>
           <FavoriteIcon />

@@ -11,7 +11,7 @@ export const SearchInput = styled.TextInput`
   border: 1px solid #cccccc;
   border-radius: 20px;
   padding: 0 12px;
-  margin: 0 16px;
+  margin: 8px 16px;
 `;
 
 export const ResultContainer = styled.View`
@@ -26,7 +26,7 @@ export const TabContainer = styled.View`
 `;
 
 export const Tab = styled.TouchableOpacity`
-  padding: 8px 20px 0 20px;
+  padding: 0 20px;
   z-index: 10;
 `;
 

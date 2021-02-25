@@ -16,13 +16,13 @@ export const Item = styled.TouchableOpacity`
 `;
 
 Item.Header = styled.View`
-  ${row};
+  ${row}
   justify-content: space-between;
   margin-bottom: 8px;
 `;
 
 Item.HeaderRight = styled.View`
-  ${row};
+  ${row}
 `;
 
 Item.Title = styled.Text`
@@ -42,19 +42,17 @@ Item.Address = styled.Text`
   margin-bottom: 8px;
 `;
 
-Item.TagList = styled.View`
-  ${row};
-  margin-left: -2px;
-  margin-bottom: 24px;
-`;
-
 Item.Tag = styled.View`
   flex-direction: row;
   align-items: center;
   position: relative;
 `;
 
-Item.TagBoundary = styled.View`
+Item.TagSeparatorContainer = styled.View`
+  ${row}
+`;
+
+Item.TagSeparator = styled.View`
   width: 1px;
   height: 12px;
   margin: 0 8px;
@@ -70,11 +68,11 @@ Item.TagName = styled.Text`
 `;
 
 Item.InfoList = styled.View`
-  ${row};
+  ${row}
 `;
 
 Item.Info = styled.View`
-  ${row};
+  ${row}
   margin-right: 16px;
 `;
 

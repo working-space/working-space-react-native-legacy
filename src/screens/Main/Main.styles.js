@@ -12,7 +12,8 @@ export const SearchInput = styled.TouchableOpacity`
   border: 1px solid #cccccc;
   border-radius: 20px;
   padding: 12px;
-  margin: 0 16px;
+  margin-top: 8px;
+  margin-bottom: 24px;
   justify-content: center;
 `;
 
