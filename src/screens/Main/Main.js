@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Keyboard } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import useStore from '~/hooks/useStore';
 import Header from '~/components/Header/Header';
@@ -10,6 +10,7 @@ import {
   SearchInput,
   HeaderText,
   FilterChangeButton,
+  FilterSelect,
   CafeListContainer,
   Dimmed,
 } from './Main.styles';
@@ -17,6 +18,7 @@ import FILTER from '~/constants/filter';
 import dummyIllustURL from '~/assets/images/dummy_illust.jpg';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
 import MapIcon from '~/assets/icons/icon_map.svg';
+import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
 
 const Main = ({ navigation }) => {
   const { AuthStore } = useStore();
@@ -28,13 +30,14 @@ const Main = ({ navigation }) => {
     setIsSelectingFilter((prevState) => !prevState);
   };
 
+  const handleSelectFilter = (filter) => {
+    setNowFilter(filter);
+    setIsSelectingFilter(false);
+  };
+
   return (
     <>
       <Header
-        nowFilter={nowFilter}
-        setNowFilter={setNowFilter}
-        isSelectingFilter={isSelectingFilter}
-        setIsSelectingFilter={setIsSelectingFilter}
         left={
           <Header.Button onPress={navigation.openDrawer}>
             <MenuIcon />
@@ -46,11 +49,39 @@ const Main = ({ navigation }) => {
               <FilterChangeButton.Text active={isSelectingFilter}>
                 {nowFilter} 순
               </FilterChangeButton.Text>
+              <DropDownArrowIcon />
             </FilterChangeButton>
             <Header.Button onPress={() => navigation.navigate('Map')}>
               <MapIcon />
             </Header.Button>
           </>
+        }
+        bottom={
+          isSelectingFilter && (
+            <FilterSelect>
+              <FilterSelect.Item
+                active={nowFilter === FILTER.NEAREST}
+                onPress={() => handleSelectFilter(FILTER.NEAREST)}>
+                <FilterSelect.Text active={nowFilter === FILTER.NEAREST}>
+                  {FILTER.NEAREST} 순
+                </FilterSelect.Text>
+              </FilterSelect.Item>
+              <FilterSelect.Item
+                active={nowFilter === FILTER.MANY_COMMENTS}
+                onPress={() => handleSelectFilter(FILTER.MANY_COMMENTS)}>
+                <FilterSelect.Text active={nowFilter === FILTER.MANY_COMMENTS}>
+                  {FILTER.MANY_COMMENTS} 순
+                </FilterSelect.Text>
+              </FilterSelect.Item>
+              <FilterSelect.Item
+                active={nowFilter === FILTER.MANY_FAVORITES}
+                onPress={() => handleSelectFilter(FILTER.MANY_FAVORITES)}>
+                <FilterSelect.Text active={nowFilter === FILTER.MANY_FAVORITES}>
+                  {FILTER.MANY_FAVORITES} 순
+                </FilterSelect.Text>
+              </FilterSelect.Item>
+            </FilterSelect>
+          )
         }
       />
       {isSelectingFilter && (

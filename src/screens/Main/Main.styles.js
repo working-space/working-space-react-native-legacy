@@ -28,12 +28,36 @@ export const HeaderText = styled.Text`
   color: #222222;
 `;
 
-export const FilterChangeButton = styled.TouchableOpacity``;
+export const FilterChangeButton = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  padding: 16px 0;
+`;
 
 FilterChangeButton.Text = styled.Text`
   font-size: 12px;
   font-weight: ${({ active }) => (active ? 'bold' : 'normal')};
   color: #222222;
+  margin-right: 4px;
+`;
+
+export const FilterSelect = styled.View`
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 8px 34px 34px 34px;
+`;
+
+FilterSelect.Item = styled.TouchableOpacity`
+  margin-right: 8px;
+  padding: 12px 16px;
+  border-radius: 20px;
+  border: solid 1px ${({ active }) => (active ? '#ff9d33' : '#f0f0f0')};
+`;
+
+FilterSelect.Text = styled.Text`
+  font-size: 12px;
+  font-weight: ${({ active }) => (active ? 'bold' : 'normal')};
 `;
 
 export const CafeListContainer = styled.View`
