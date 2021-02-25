@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 import { css } from '@emotion/native';
 import { Item } from './CafeListItem.styles';
 import TAG from '~/constants/tag';
@@ -48,12 +48,12 @@ const CafeListItem = (props) => {
       </Item.Header>
       <Item.Address>{address}</Item.Address>
       <FlatList
+        horizontal
         contentContainerStyle={css`
           justify-content: center;
           margin-left: -2px;
           margin-bottom: 24px;
         `}
-        horizontal
         scrollEnabled={false}
         ItemSeparatorComponent={() => (
           <Item.TagSeparatorContainer>
@@ -61,6 +61,7 @@ const CafeListItem = (props) => {
           </Item.TagSeparatorContainer>
         )}
         data={tagList}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <Item.Tag>
             {item.icon && <Item.TagIcon>{item.icon}</Item.TagIcon>}

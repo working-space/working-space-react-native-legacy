@@ -12,6 +12,7 @@ export const SearchInput = styled.TouchableOpacity`
   border: 1px solid #cccccc;
   border-radius: 20px;
   padding: 12px;
+  margin: 0 16px;
   margin-top: 8px;
   margin-bottom: 24px;
   justify-content: center;
@@ -27,6 +28,18 @@ export const HeaderText = styled.Text`
   font-size: 24px;
   line-height: 36px;
   color: #222222;
+`;
+
+export const ScrolledListHeader = styled.View`
+  padding: 16px 16px 24px 16px;
+  border-style: solid;
+  border-color: #f0f0f0;
+  border-bottom-width: 1px;
+`;
+
+ScrolledListHeader.Text = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
 `;
 
 export const FilterChangeButton = styled.TouchableOpacity`

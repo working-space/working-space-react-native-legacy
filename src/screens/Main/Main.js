@@ -1,12 +1,5 @@
-import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  FlatList,
-  RefreshControl,
-  Dimensions,
-  Text,
-} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { FlatList, Text } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import useStore from '~/hooks/useStore';
 import Header from '~/components/Header/Header';
@@ -16,9 +9,9 @@ import {
   Container,
   SearchInput,
   HeaderText,
+  ScrolledListHeader,
   FilterChangeButton,
   FilterSelect,
-  CafeListContainer,
   Dimmed,
 } from './Main.styles';
 import FILTER from '~/constants/filter';
@@ -37,6 +30,7 @@ const Main = ({ navigation }) => {
   const { logout } = AuthStore;
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
+  const [showScrolledListHeader, setShowScrolledListHeader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [cafeList, setCafeList] = useState([
     {
@@ -66,6 +60,42 @@ const Main = ({ navigation }) => {
       favoriteCount: 10,
       commentCount: 19,
     },
+    {
+      id: '3',
+      title: '캐틀앤비',
+      distance: '3.5km',
+      address: '서울 서대문구 신촌동 190-21',
+      tags: ['PARKING_LOT', 'CLEAN_TOILET', 'CONCENT', 'TWENTY_FOUR'],
+      favoriteCount: 10,
+      commentCount: 19,
+    },
+    {
+      id: '4',
+      title: '캐틀앤비',
+      distance: '3.5km',
+      address: '서울 서대문구 신촌동 190-21',
+      tags: ['PARKING_LOT', 'CLEAN_TOILET', 'CONCENT', 'TWENTY_FOUR'],
+      favoriteCount: 10,
+      commentCount: 19,
+    },
+    {
+      id: '5',
+      title: '캐틀앤비',
+      distance: '3.5km',
+      address: '서울 서대문구 신촌동 190-21',
+      tags: ['PARKING_LOT', 'CLEAN_TOILET', 'CONCENT', 'TWENTY_FOUR'],
+      favoriteCount: 10,
+      commentCount: 19,
+    },
+    {
+      id: '6',
+      title: '캐틀앤비',
+      distance: '3.5km',
+      address: '서울 서대문구 신촌동 190-21',
+      tags: ['PARKING_LOT', 'CLEAN_TOILET', 'CONCENT', 'TWENTY_FOUR'],
+      favoriteCount: 10,
+      commentCount: 19,
+    },
   ]);
 
   const handleToggleSelectingFilter = () => {
@@ -77,9 +107,21 @@ const Main = ({ navigation }) => {
     setIsSelectingFilter(false);
   };
 
-  const handleRefresh = React.useCallback(() => {
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
     wait(2000).then(() => setRefreshing(false));
+  }, []);
+
+  const handleScroll = useCallback((event) => {
+    const THRESHOLD = 300;
+    // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
+    // TODO: 스크롤을 위로 올렸을 때 FlatList의 스크롤이 덜컥거리는 듯이 보이는 문제 수정 필요
+    // TODO: showHeader
+    if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
+      setShowScrolledListHeader(true);
+    } else {
+      setShowScrolledListHeader(false);
+    }
   }, []);
 
   return (
@@ -137,10 +179,23 @@ const Main = ({ navigation }) => {
         </Dimmed>
       )}
       <Container>
+        <SearchInput onPress={() => navigation.navigate('Search')}>
+          <SearchInput.PlaceHolder>
+            현위치 : 서울시 서초구 양재천로 131 4층
+          </SearchInput.PlaceHolder>
+        </SearchInput>
+        {showScrolledListHeader && (
+          <ScrolledListHeader>
+            <ScrolledListHeader.Text>
+              망원동에서 제일 가까운 곳
+            </ScrolledListHeader.Text>
+          </ScrolledListHeader>
+        )}
         <FlatList
           contentContainerStyle={css`
             margin: 0 16px;
           `}
+          onScroll={handleScroll}
           refreshing={refreshing}
           onRefresh={handleRefresh}
           data={cafeList}
@@ -148,11 +203,6 @@ const Main = ({ navigation }) => {
           renderItem={({ item }) => <CafeListItem data={item} />}
           ListHeaderComponent={() => (
             <>
-              <SearchInput onPress={() => navigation.navigate('Search')}>
-                <SearchInput.PlaceHolder>
-                  현위치 : 서울시 서초구 양재천로 131 4층
-                </SearchInput.PlaceHolder>
-              </SearchInput>
               <HeaderText>
                 망원동에서{'\n'}
                 가장 {nowFilter} 곳
