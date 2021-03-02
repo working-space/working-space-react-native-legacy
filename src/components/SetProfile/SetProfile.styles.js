@@ -23,8 +23,11 @@ export const EditImage = styled.TouchableOpacity`
 EditImage.Photo = styled.View`
   width: 100px;
   height: 100px;
+  overflow: hidden;
   background-color: #cccccc;
   border-radius: 100px;
+  justify-content: center;
+  align-items: center;
 `;
 
 EditImage.Icon = styled.View`

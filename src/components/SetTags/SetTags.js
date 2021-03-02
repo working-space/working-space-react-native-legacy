@@ -9,7 +9,7 @@ const SetTags = ({ preferTags, onToggleTag, allTags }) => {
         return (
           <EditTags style={{ paddingBottom: i === allTags.length - 1 ? 0 : 32 }} key={i}>
             {rowTags.map((tag) => {
-              return <TagItem key={tag.id} tag={tag} selected={preferTags.includes(tag.id)} onClick={onToggleTag} />
+              return <TagItem key={tag.id} tag={tag} selected={preferTags.includes(tag.id)} onClick={onToggleTag} />;
             })}
           </EditTags>
         );
