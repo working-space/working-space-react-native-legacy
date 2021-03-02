@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { FlatList, Text } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import useStore from '~/hooks/useStore';
 import Header from '~/components/Header/Header';
@@ -115,8 +115,7 @@ const Main = ({ navigation }) => {
   const handleScroll = useCallback((event) => {
     const THRESHOLD = 300;
     // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
-    // TODO: 스크롤을 위로 올렸을 때 FlatList의 스크롤이 덜컥거리는 듯이 보이는 문제 수정 필요
-    // TODO: showHeader
+    // TODO: showScrolledListHeader가 변경될 때마다 이미지가 깜빡거리는 문제 수정 필요
     if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
       setShowScrolledListHeader(true);
     } else {
@@ -179,18 +178,21 @@ const Main = ({ navigation }) => {
         </Dimmed>
       )}
       <Container>
-        <SearchInput onPress={() => navigation.navigate('Search')}>
-          <SearchInput.PlaceHolder>
-            현위치 : 서울시 서초구 양재천로 131 4층
-          </SearchInput.PlaceHolder>
-        </SearchInput>
-        {showScrolledListHeader && (
-          <ScrolledListHeader>
-            <ScrolledListHeader.Text>
-              망원동에서 제일 가까운 곳
-            </ScrolledListHeader.Text>
-          </ScrolledListHeader>
-        )}
+        <View>
+          <SearchInput onPress={() => navigation.navigate('Search')}>
+            <SearchInput.PlaceHolder>
+              현위치 : 서울시 서초구 양재천로 131 4층
+            </SearchInput.PlaceHolder>
+          </SearchInput>
+          {showScrolledListHeader && (
+            <ScrolledListHeader>
+              <ScrolledListHeader.Text>
+                망원동에서 제일 가까운 곳
+              </ScrolledListHeader.Text>
+            </ScrolledListHeader>
+          )}
+        </View>
+
         <FlatList
           contentContainerStyle={css`
             margin: 0 16px;
