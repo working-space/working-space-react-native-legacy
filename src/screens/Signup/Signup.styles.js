@@ -3,14 +3,14 @@ import styled from '@emotion/native';
 export const Container = styled.View`
   flex: 1;
   background-color: #fff;
-  padding: 16px;
+  padding: 0 16px;
 `;
 
 export const HeaderText = styled.Text`
   font-weight: 700;
   font-size: 24px;
   line-height: 36px;
-  color: #222222;
+  color: #222;
   padding-top: 48px;
   padding-bottom: 60px;
 `;
@@ -21,8 +21,9 @@ export const ModalView = styled.ScrollView`
 `;
 
 export const Footer = styled.View`
+  flex: 1;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   padding: 12px;

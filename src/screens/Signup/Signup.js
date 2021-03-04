@@ -3,16 +3,20 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { observer } from 'mobx-react-lite';
 import { isEmpty } from 'lodash';
 import * as ImagePicker from 'react-native-image-picker';
+import Modal from 'react-native-modal';
 import useStore from '~/hooks/useStore';
 import { HeaderText, Container, ModalView, Footer, FooterBtn } from './Signup.styles';
 import SetProfile from '~/components/SetProfile/SetProfile';
 import SetTags from '~/components/SetTags/SetTags';
+import InputText from '~/components/InputText/InputText';
+import { KeyboardAvoidingView } from 'react-native';
 
 const Signup = () => {
   const { AuthStore } = useStore();
   const { login } = AuthStore;
 
   const [visibleForm, setVisibleForm] = useState('setProfile');
+  const [visibleInput, setVisibleInput] = useState(false);
   const [userData, setUserData] = useState([]);
   const [nickname, setNickname] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
@@ -34,15 +38,12 @@ const Signup = () => {
   }, []);
 
   const handlePrevBtn = () => {
-    console.log('prev');
     visibleForm === 'setTags' && setVisibleForm('setProfile');
   };
 
   const handleNextBtn = () => {
-    console.log('next');
     visibleForm === 'setProfile' && setVisibleForm('setTags');
     if (visibleForm === 'setTags') {
-      console.log('end');
       login(userData.token);
     }
   };
@@ -69,6 +70,15 @@ const Signup = () => {
     );
   }, []);
 
+  const handleSetNicknameModal = useCallback(async () => {
+    await setVisibleInput(true);
+  }, []);
+
+  const handleSetNickname = useCallback(async (text) => {
+    await setNickname(text);
+    await setVisibleInput(false);
+  }, []);
+
   const handleToggleTag = useCallback((tag) => {
     setPreferTags((prevSelectedTagIds) => {
       const ids = [...prevSelectedTagIds];
@@ -83,34 +93,41 @@ const Signup = () => {
   }, []);
 
   return (
-    <Container>
-      <HeaderText>
-        {userData.nickname}님,{'\n'}반가워요!{'\n'}프로필을 설정해볼까요?
-      </HeaderText>
-      <ModalView>
-        {visibleForm === 'setProfile' && <SetProfile nickname={nickname} profileImage={profileImage} onSetProfileImage={handleSetProfileImage} />}
-        {visibleForm === 'setTags' && <SetTags preferTags={preferTags} onToggleTag={handleToggleTag} />}
-      </ModalView>
-      <Footer>
-        {visibleForm === 'setTags' ? (
-          <FooterBtn onPress={handlePrevBtn}>
-            <FooterBtn.Prev>이전</FooterBtn.Prev>
+    <>
+      <Container>
+        <HeaderText>
+          {nickname}님,{'\n'}반가워요!{'\n'}프로필을 설정해볼까요?
+        </HeaderText>
+        <ModalView>
+          {visibleForm === 'setProfile' && <SetProfile nickname={nickname} profileImage={profileImage} onSetProfileImage={handleSetProfileImage} onSetNicknameModal={handleSetNicknameModal} />}
+          {visibleForm === 'setTags' && <SetTags preferTags={preferTags} onToggleTag={handleToggleTag} />}
+        </ModalView>
+        <Footer>
+          {visibleForm === 'setTags' ? (
+            <FooterBtn onPress={handlePrevBtn}>
+              <FooterBtn.Prev>이전</FooterBtn.Prev>
+            </FooterBtn>
+          ) : (
+            <FooterBtn style={{ paddingLeft: 0 }}>
+              <FooterBtn.Text>
+                개인 정보 수집에 동의하신다면 아래의 ‘다음'{'\n'}
+                버튼을 눌러주세요.
+              </FooterBtn.Text>
+            </FooterBtn>
+          )}
+          <FooterBtn style={{ backgroundColor: visibleForm === 'setProfile' ? '#ffbb44' : isEmpty(preferTags) ? '#fff' : '#ffbb44' }} onPress={handleNextBtn}>
+            <FooterBtn.Next style={{ color: visibleForm === 'setProfile' ? '#fff' : isEmpty(preferTags) ? '#222' : '#fff' }}>
+              {visibleForm === 'setProfile' ? '다음' : isEmpty(preferTags) ? '건너뛰기' : '완료'}
+            </FooterBtn.Next>
           </FooterBtn>
-        ) : (
-          <FooterBtn style={{ paddingLeft: 0 }}>
-            <FooterBtn.Text>
-              개인 정보 수집에 동의하신다면 아래의 ‘다음'{'\n'}
-              버튼을 눌러주세요.
-            </FooterBtn.Text>
-          </FooterBtn>
-        )}
-        <FooterBtn style={{ backgroundColor: visibleForm === 'setProfile' ? '#ffbb44' : isEmpty(preferTags) ? '#fff' : '#ffbb44' }} onPress={handleNextBtn}>
-          <FooterBtn.Next style={{ color: visibleForm === 'setProfile' ? '#fff' : isEmpty(preferTags) ? '#222' : '#fff' }}>
-            {visibleForm === 'setProfile' ? '다음' : isEmpty(preferTags) ? '건너뛰기' : '완료'}
-          </FooterBtn.Next>
-        </FooterBtn>
-      </Footer>
-    </Container>
+        </Footer>
+      </Container>
+      <KeyboardAvoidingView>
+        <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput} onBackButtonPress={() => setVisibleInput(false)} hideModalContentWhileAnimating={true} useNativeDriver={true}>
+          <InputText defaultText={nickname} onSetNickname={handleSetNickname} />
+        </Modal>
+      </KeyboardAvoidingView>
+    </>
   );
 };
 

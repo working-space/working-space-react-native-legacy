@@ -6,21 +6,25 @@ import SmallCameraIcon from '~/assets/icons/icon_small_camera.svg';
 import SmallPersonIcon from '~/assets/icons/icon_small_person.svg';
 import SmallEditIcon from '~/assets/icons/icon_small_edit.svg';
 
-const SetProfile = ({ nickname, profileImage, onSetProfileImage }) => {
-  const handleClick = useCallback(() => {
+const SetProfile = ({ nickname, profileImage, onSetProfileImage, onSetNicknameModal }) => {
+  const handleClickImage = useCallback(() => {
     onSetProfileImage?.();
   }, [onSetProfileImage]);
+
+  const handleChangeNicknameModal = useCallback(() => {
+    onSetNicknameModal?.();
+  }, [onSetNicknameModal]);
 
   return (
     <Container>
       <EditProfile>
-        <EditImage onPress={handleClick}>
+        <EditImage onPress={handleClickImage}>
           <EditImage.Photo>{isEmpty(profileImage) ? <SmallPersonIcon /> : <Image style={{ width: 100, height: 100 }} source={{ uri: profileImage }} />}</EditImage.Photo>
           <EditImage.Icon>
             <SmallCameraIcon />
           </EditImage.Icon>
         </EditImage>
-        <EditName>
+        <EditName onPress={handleChangeNicknameModal}>
           <EditName.Text>{nickname}</EditName.Text>
           <EditName.Icon>
             <SmallEditIcon />
