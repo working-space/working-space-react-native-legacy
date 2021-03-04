@@ -20,11 +20,22 @@ export const Footer = styled.View`
 `;
 
 export const LoginBtn = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   border: 1px solid #ccc;
   padding: 17px 105px 17px 106px;
   border-radius: 4px;
   margin-bottom: 12px;
+`;
+
+LoginBtn.Icon = styled.View`
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
 `;
 
 LoginBtn.Text = styled.Text`
