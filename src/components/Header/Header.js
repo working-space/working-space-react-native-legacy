@@ -7,12 +7,15 @@ const HeaderButton = (props) => (
 );
 
 const Header = (props) => {
-  const { left, right } = props;
+  const { left, right, bottom } = props;
 
   return (
     <Container>
-      <View>{left}</View>
-      <RightSide>{right}</RightSide>
+      <Container.Top>
+        <View>{left}</View>
+        <RightSide>{right}</RightSide>
+      </Container.Top>
+      <Container.Bottom>{bottom}</Container.Bottom>
     </Container>
   );
 };
