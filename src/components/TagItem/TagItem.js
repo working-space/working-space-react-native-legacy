@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Item } from './TagItem.styles';
-import TAG from '~/constants/Tag';
+import TAG from '~/constants/tag';
 import SmallCheckIcon from '~/assets/icons/icon_small_check.svg';
 
 const TagItem = ({ tag, selected, onClick }) => {
