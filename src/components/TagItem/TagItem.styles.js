@@ -17,12 +17,13 @@ Item.checkIcon = styled.View`
   width: 20px;
   height: 20px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -2px;
+  right: -2px;
   justify-content: center;
   align-items: center;
   background-color: #ffbb44;
   border-radius: 20px;
+  border: 2px solid #fff;
 `;
 
 Item.TagName = styled.Text`
