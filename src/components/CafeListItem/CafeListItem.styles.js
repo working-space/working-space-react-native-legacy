@@ -15,6 +15,23 @@ export const Item = styled.TouchableOpacity`
   margin-bottom: 8px;
 `;
 
+Item.BadgeList = styled.View`
+  ${row};
+  margin-bottom: 8px;
+`;
+
+Item.Badge = styled.View`
+  background-color: #ffbb44;
+  padding: 0 2px;
+  margin-right: 8px;
+`;
+
+Item.BadgeText = styled.Text`
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+`;
+
 Item.Header = styled.View`
   ${row}
   justify-content: space-between;
