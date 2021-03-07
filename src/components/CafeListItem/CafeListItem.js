@@ -8,14 +8,7 @@ import FavoriteIcon from '~/assets/icons/icon_favorite.svg';
 import CommentIcon from '~/assets/icons/icon_comment.svg';
 
 const CafeListItem = (props) => {
-  const {
-    title,
-    distance,
-    address,
-    tags,
-    favoriteCount,
-    commentCount,
-  } = props.data;
+  const { title, distance, address, tags, badges, favoriteCount, commentCount } = props.data;
 
   const [tagList, setTagList] = useState([]);
 
@@ -39,6 +32,13 @@ const CafeListItem = (props) => {
 
   return (
     <Item>
+      <Item.BadgeList>
+        {badges.map((badge) => (
+          <Item.Badge key={badge}>
+            <Item.BadgeText>{badge}</Item.BadgeText>
+          </Item.Badge>
+        ))}
+      </Item.BadgeList>
       <Item.Header>
         <Item.Title>{title}</Item.Title>
         <Item.HeaderRight>
@@ -89,6 +89,7 @@ CafeListItem.defaultProps = {
     distance: '',
     address: '',
     tags: [],
+    badges: [],
     favoriteCount: 0,
     commentCount: 0,
   },
