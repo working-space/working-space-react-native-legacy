@@ -8,9 +8,14 @@ import FavoriteIcon from '~/assets/icons/icon_favorite.svg';
 import CommentIcon from '~/assets/icons/icon_comment.svg';
 
 const CafeListItem = (props) => {
+  const { onCardLinkClick } = props;
   const { title, distance, address, tags, badges, favoriteCount, commentCount } = props.data;
 
   const [tagList, setTagList] = useState([]);
+
+  const handleCardLinkClick = useCallback(() => {
+    onCardLinkClick?.(props.data);
+  }, [onCardLinkClick, props.data]);
 
   const getTagList = useCallback(() => {
     const CUT_LINE = 2;
@@ -31,7 +36,7 @@ const CafeListItem = (props) => {
   }, [getTagList]);
 
   return (
-    <Item>
+    <Item onPress={handleCardLinkClick}>
       <Item.BadgeList>
         {badges.map((badge) => (
           <Item.Badge key={badge}>

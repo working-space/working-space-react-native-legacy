@@ -122,6 +122,14 @@ const Main = ({ navigation }) => {
     }
   }, []);
 
+  const handleCardLinkClick = useCallback(
+    (card) => {
+      console.log(card);
+      navigation.navigate('Detail', { cardData: card });
+    },
+    [navigation],
+  );
+
   return (
     <>
       <Header
@@ -183,7 +191,7 @@ const Main = ({ navigation }) => {
           onRefresh={handleRefresh}
           data={cafeList}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <CafeListItem data={item} />}
+          renderItem={({ item }) => <CafeListItem data={item} onCardLinkClick={handleCardLinkClick} />}
           ListHeaderComponent={() => (
             <>
               <HeaderText>
