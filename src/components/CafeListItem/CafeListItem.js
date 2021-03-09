@@ -22,7 +22,7 @@ const CafeListItem = (props) => {
 
     const displayTags = tags.slice(0, CUT_LINE);
     const hiddenTagCount = tags.slice(CUT_LINE).length;
-    let result = displayTags.map((tag) => TAG[tag]);
+    let result = displayTags.map((tag) => TAG[tag.id]);
 
     if (hiddenTagCount > 0) {
       result = [...result, { name: `+${hiddenTagCount}` }];

@@ -4,29 +4,36 @@ export const Item = styled.TouchableOpacity`
   flex: 1;
   align-items: center;
   background-color: #fff;
-  padding: 0 16px;
+  padding: 0;
 `;
 
 Item.TagIcon = styled.View`
   padding: 16px;
   border-radius: 64px;
-  border: solid 1px #cccccc;
+  border-style: solid;
+  border-width: 1px;
 `;
 
 Item.checkIcon = styled.View`
   width: 20px;
   height: 20px;
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -1px;
+  right: -1px;
   justify-content: center;
   align-items: center;
-  background-color: #ffbb44;
   border-radius: 20px;
-  border: 2px solid #fff;
+`;
+
+Item.countText = styled.Text`
+  text-align: center;
+  font-size: 11px;
+  line-height: 14px;
+  color: #ffffff;
 `;
 
 Item.TagName = styled.Text`
+  width: 58px;
   text-align: center;
   font-size: 12px;
   line-height: 16px;
