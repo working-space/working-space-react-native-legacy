@@ -45,5 +45,5 @@ TagListBox.Button = styled.Text`
 
 TagListBox.AllTags = styled.ScrollView`
   flex-direction: row;
-  padding: 0;
+  margin: 0 9px;
 `;

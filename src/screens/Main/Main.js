@@ -173,7 +173,6 @@ const Main = ({ navigation }) => {
 
   const handleCardLinkClick = useCallback(
     (card) => {
-      console.log(card);
       navigation.navigate('Detail', { cardData: card });
     },
     [navigation],

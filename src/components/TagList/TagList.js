@@ -26,7 +26,7 @@ const TagList = (props) => {
         </TagListBox.Header>
         <TagListBox.AllTags horizontal={true} showsHorizontalScrollIndicator={true}>
           {tags.map((tag, i) => {
-            return <TagItem key={i} showCount={true} tag={tag} selected={preferTags.includes(tag.id)} style={{ padding: 0 }} paddingValue={12} />;
+            return <TagItem key={i} showCount={true} tag={tag} selected={preferTags.includes(tag.id)} paddingValue={9} />;
           })}
         </TagListBox.AllTags>
       </TagListBox>

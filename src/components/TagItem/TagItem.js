@@ -48,4 +48,8 @@ const TagItem = ({ tag, showCount, selected, onClick, paddingValue }) => {
   );
 };
 
+TagItem.defaultProps = {
+  paddingValue: 8,
+};
+
 export default TagItem;
