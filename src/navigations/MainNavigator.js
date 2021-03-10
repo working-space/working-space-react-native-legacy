@@ -6,6 +6,7 @@ import Search from '~/screens/Search/Search';
 import Favorites from '~/screens/UserMenu/Favorites/Favorites';
 import Comments from '~/screens/UserMenu/Comments/Comments';
 import Bookmarks from '~/screens/UserMenu/Bookmarks/Bookmarks';
+import Detail from '~/screens/Detail/Detail';
 
 const Stack = createStackNavigator();
 
@@ -67,6 +68,13 @@ const MainNavigator = () => {
         options={{
           headerShown: false,
           headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="Detail"
+        component={Detail}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

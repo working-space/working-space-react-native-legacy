@@ -9,9 +9,14 @@ import CommentIcon from '~/assets/icons/icon_comment.svg';
 import EditIcon from '~/assets/icons/icon_edit.svg';
 
 const CafeListItem = (props) => {
+  const { onCardLinkClick } = props;
   const { title, distance, address, tags, badges, favoriteCount, commentCount } = props.data;
 
   const [tagList, setTagList] = useState([]);
+
+  const handleCardLinkClick = useCallback(() => {
+    onCardLinkClick?.(props.data);
+  }, [onCardLinkClick, props.data]);
 
   const getTagList = useCallback(() => {
     if (!tags || tags.length <= 0) return;
@@ -20,7 +25,7 @@ const CafeListItem = (props) => {
 
     const displayTags = tags.slice(0, CUT_LINE);
     const hiddenTagCount = tags.slice(CUT_LINE).length;
-    let result = displayTags.map((tag) => TAG[tag]);
+    let result = displayTags.map((tag) => TAG[tag.id]);
 
     if (hiddenTagCount > 0) {
       result = [...result, { name: `+${hiddenTagCount}` }];
@@ -34,7 +39,7 @@ const CafeListItem = (props) => {
   }, [getTagList]);
 
   return (
-    <Item>
+    <Item onPress={handleCardLinkClick}>
       <Item.BadgeList>
         {badges &&
           badges.length > 0 &&
