@@ -12,7 +12,6 @@ export const Item = styled.TouchableOpacity`
   border-radius: 4px;
   padding: 16px;
   background-color: white;
-  margin-bottom: 8px;
 `;
 
 Item.BadgeList = styled.View`
@@ -57,6 +56,17 @@ Item.Address = styled.Text`
   font-size: 11px;
   color: #a7a7a7;
   margin-bottom: 8px;
+`;
+
+Item.TagEmpty = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 24px;
+`;
+
+Item.TagEmptyText = styled.Text`
+  font-size: 11px;
+  color: #a7a7a7;
 `;
 
 Item.Tag = styled.View`

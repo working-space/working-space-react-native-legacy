@@ -83,6 +83,10 @@ export const CafeListContainer = styled.View`
   margin: 24px 16px;
 `;
 
+export const ListSeparator = styled.View`
+  margin-bottom: 8px;
+`;
+
 export const Dimmed = styled.TouchableOpacity`
   width: 100%;
   height: 100%;
