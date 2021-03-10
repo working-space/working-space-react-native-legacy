@@ -5,7 +5,7 @@ import useStore from '~/hooks/useStore';
 import Header from '~/components/Header/Header';
 import AutoFitImage from '~/components/AutoFitImage/AutoFitImage';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
-import { Container, SearchInput, HeaderText, ScrolledListHeader, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
+import { Container, SearchInput, HeaderText, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
 import FILTER from '~/constants/filter';
 import dummyIllustURL from '~/assets/images/dummy_illust.jpg';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
@@ -235,10 +235,11 @@ const Main = ({ navigation }) => {
             margin: 0 16px;
           `}
           onScroll={handleScroll}
-          refreshing={refreshing}
           onRefresh={handleRefresh}
+          refreshing={refreshing}
           data={cafeList}
           keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <ListSeparator />}
           renderItem={({ item }) => <CafeListItem data={item} onCardLinkClick={handleCardLinkClick} />}
           ListHeaderComponent={() => (
             <>

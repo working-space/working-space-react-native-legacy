@@ -42,6 +42,7 @@ const MainNavigator = () => {
         name="Map"
         component={Map}
         options={{
+          headerShown: false,
           headerBackTitleVisible: false,
         }}
       />

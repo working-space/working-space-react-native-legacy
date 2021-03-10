@@ -1,66 +1,131 @@
-import React from 'react';
-import NaverMapView, {
-  Circle,
-  Marker,
-  Path,
-  Polyline,
-  Polygon,
-} from 'react-native-nmap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { css } from '@emotion/native';
+import NaverMapView, { Marker } from 'react-native-nmap';
 import { observer } from 'mobx-react-lite';
-import { Container } from './Map.styles';
+import Geolocation from 'react-native-geolocation-service';
+import api from '~/api';
+import Header from '~/components/Header/Header';
+import FloatingActionButton from '~/components/FloatingActionButton/FloatingActionButton';
+import { Container, SearchInput, Card } from './Map.styles';
+import MenuIcon from '~/assets/icons/icon_menu.svg';
+import ListIcon from '~/assets/icons/icon_list.svg';
+import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
+import CurrentLocationIcon from '~/assets/icons/icon_current_location.svg';
+import MapPickerIcon from '~/assets/icons/icon_mappicker.svg';
+import CafeListItem from '../../components/CafeListItem/CafeListItem';
 
-const Map = () => {
-  const P0 = { latitude: 37.564362, longitude: 126.977011 };
-  const P1 = { latitude: 37.565051, longitude: 126.978567 };
-  const P2 = { latitude: 37.565383, longitude: 126.976292 };
+const Map = ({ navigation }) => {
+  const [location, setLocation] = useState(null);
+  const [cafes, setCafes] = useState([]);
+  const [selectedCafe, setSelectedCafe] = useState(null);
+
+  const handleClickMarker = ({ name, distance, road_addr }) => {
+    const cafe = {
+      title: name,
+      distance,
+      address: road_addr,
+    };
+    setSelectedCafe(cafe);
+  };
+
+  const handleGetLocation = useCallback(() => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({
+          latitude,
+          longitude,
+        });
+      },
+      (error) => {
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+    );
+  }, []);
+
+  const fetchCafes = useCallback(async () => {
+    if (!location) {
+      return;
+    }
+
+    const { latitude, longitude } = location;
+    const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&page=1`);
+
+    setCafes(response.data.results);
+  }, [location]);
+
+  useEffect(() => {
+    handleGetLocation();
+  }, [handleGetLocation]);
+
+  useEffect(() => {
+    fetchCafes();
+  }, [fetchCafes]);
+
   return (
-    <Container>
-      <NaverMapView
-        style={{ width: '100%', height: '100%' }}
-        showsMyLocationButton={true}
-        center={{ ...P0, zoom: 16 }}
-        // onTouch={(e) => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
-        // onCameraChange={(e) =>
-        //   console.warn('onCameraChange', JSON.stringify(e))
-        // }
-        // onMapClick={(e) => console.warn('onMapClick', JSON.stringify(e))}
-      >
-        <Marker
-          coordinate={P0}
-          // onClick={() => console.warn('onClick! p0')}
-        />
-        <Marker
-          coordinate={P1}
-          pinColor="blue"
-          // onClick={() => console.warn('onClick! p1')}
-        />
-        <Marker
-          coordinate={P2}
-          pinColor="red"
-          // onClick={() => console.warn('onClick! p2')}
-        />
-        <Path
-          coordinates={[P0, P1]}
-          // onClick={() => console.warn('onClick! path')}
-          width={10}
-        />
-        <Polyline
-          coordinates={[P1, P2]}
-          // onClick={() => console.warn('onClick! polyline')}
-        />
-        <Circle
-          coordinate={P0}
-          color={'rgba(255,0,0,0.3)'}
-          radius={200}
-          // onClick={() => console.warn('onClick! circle')}
-        />
-        <Polygon
-          coordinates={[P0, P1, P2]}
-          color={`rgba(0, 0, 0, 0.5)`}
-          // onClick={() => console.warn('onClick! polygon')}
-        />
-      </NaverMapView>
-    </Container>
+    <>
+      <Header
+        left={
+          <Header.Button onPress={navigation.openDrawer}>
+            <MenuIcon />
+          </Header.Button>
+        }
+        right={
+          <Header.Button onPress={() => navigation.navigate('Main')}>
+            <ListIcon />
+          </Header.Button>
+        }
+      />
+      <Container>
+        <SearchInput onPress={() => navigation.navigate('Search')}>
+          <SearchInput.PlaceHolder>현위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
+        </SearchInput>
+        <NaverMapView
+          style={css`
+            flex: 1;
+          `}
+          showsMyLocationButton={true}
+          zoomControl={false}
+          center={location && { ...location, zoom: 16 }}
+          // onTouch={(e) => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
+          // onCameraChange={(e) =>
+          //   console.warn('onCameraChange', JSON.stringify(e))
+          // }
+          onMapClick={() => setSelectedCafe(null)}>
+          {/* {location && (
+            <Marker
+              coordinate={location}
+              width={36}
+              height={36}
+              // onClick={() => console.warn('onClick! p0')}
+            >
+              <CurrentLocationIcon />
+            </Marker>
+          )} */}
+          {cafes.length > 0 &&
+            cafes.map((cafe) => {
+              const { id, name, road_addr, location, dist } = cafe;
+              const [longitude, latitude] = location.coordinates;
+              const distance = dist.calculated;
+
+              return (
+                <Marker key={id} coordinate={{ latitude, longitude }} width={24} height={24} onClick={() => handleClickMarker(cafe)}>
+                  <MapPickerIcon />
+                </Marker>
+              );
+            })}
+        </NaverMapView>
+        {/* <FloatingActionButton onPress={() => handleGetLocation()}>
+          <LocateActiveIcon />
+        </FloatingActionButton> */}
+        {selectedCafe && (
+          <Card>
+            <CafeListItem data={selectedCafe} />
+          </Card>
+        )}
+      </Container>
+    </>
   );
 };
 
