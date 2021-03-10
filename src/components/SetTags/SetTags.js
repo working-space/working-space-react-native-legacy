@@ -1,4 +1,5 @@
 import React from 'react';
+import { css } from '@emotion/native';
 import { AllTags, EditTags } from './SetTags.styles';
 import TagItem from '~/components/TagItem/TagItem';
 
@@ -7,9 +8,13 @@ const SetTags = ({ preferTags, onToggleTag, allTags }) => {
     <AllTags>
       {allTags.map((rowTags, i) => {
         return (
-          <EditTags style={{ paddingBottom: i === allTags.length - 1 ? 0 : 32 }} key={i}>
+          <EditTags
+            style={css`
+              padding-bottom: ${i === allTags.length - 1 ? '0' : '32px'};
+            `}
+            key={i}>
             {rowTags.map((tag) => {
-              return <TagItem key={tag.id} tag={tag} selected={preferTags.includes(tag.id)} onClick={onToggleTag} />;
+              return <TagItem key={tag.id} showCount={false} tag={tag} selected={preferTags.includes(tag.id)} onClick={onToggleTag} />;
             })}
           </EditTags>
         );
