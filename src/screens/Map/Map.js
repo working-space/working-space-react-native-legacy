@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { css } from '@emotion/native';
-import NaverMapView, { Marker } from 'react-native-nmap';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import Geolocation from 'react-native-geolocation-service';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+
 import api from '~/api';
 import Header from '~/components/Header/Header';
 import FloatingActionButton from '~/components/FloatingActionButton/FloatingActionButton';
@@ -10,17 +10,19 @@ import { Container, SearchInput, Card } from './Map.styles';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
 import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
-import CurrentLocationIcon from '~/assets/icons/icon_current_location.svg';
 import MapPickerIcon from '~/assets/icons/icon_mappicker.svg';
+import MapPickerSelectIcon from '~/assets/icons/icon_mappicker_select.svg';
 import CafeListItem from '../../components/CafeListItem/CafeListItem';
 
 const Map = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [cafes, setCafes] = useState([]);
   const [selectedCafe, setSelectedCafe] = useState(null);
+  const mapRef = useRef();
 
-  const handleClickMarker = ({ name, distance, road_addr }) => {
+  const handleClickMarker = ({ id, name, distance, road_addr }) => {
     const cafe = {
+      id: id,
       title: name,
       distance,
       address: road_addr,
@@ -36,6 +38,7 @@ const Map = ({ navigation }) => {
           latitude,
           longitude,
         });
+        mapRef.current.setCamera({ center: { latitude, longitude } });
       },
       (error) => {
         console.log(error.code, error.message);
@@ -81,28 +84,19 @@ const Map = ({ navigation }) => {
         <SearchInput onPress={() => navigation.navigate('Search')}>
           <SearchInput.PlaceHolder>현위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
         </SearchInput>
-        <NaverMapView
-          style={css`
-            flex: 1;
-          `}
-          showsMyLocationButton={true}
-          zoomControl={false}
-          center={location && { ...location, zoom: 16 }}
-          // onTouch={(e) => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
-          // onCameraChange={(e) =>
-          //   console.warn('onCameraChange', JSON.stringify(e))
-          // }
-          onMapClick={() => setSelectedCafe(null)}>
-          {/* {location && (
-            <Marker
-              coordinate={location}
-              width={36}
-              height={36}
-              // onClick={() => console.warn('onClick! p0')}
-            >
-              <CurrentLocationIcon />
-            </Marker>
-          )} */}
+
+        <MapView
+          showsUserLocation
+          ref={mapRef}
+          style={{ flex: 1 }}
+          provider={PROVIDER_GOOGLE}
+          initialRegion={{
+            latitude: 37.498095,
+            longitude: 127.02761,
+            latitudeDelta: 0.009,
+            longitudeDelta: 0.009,
+          }}
+          onPress={() => setSelectedCafe(null)}>
           {cafes.length > 0 &&
             cafes.map((cafe) => {
               const { id, name, road_addr, location, dist } = cafe;
@@ -110,15 +104,15 @@ const Map = ({ navigation }) => {
               const distance = dist.calculated;
 
               return (
-                <Marker key={id} coordinate={{ latitude, longitude }} width={24} height={24} onClick={() => handleClickMarker(cafe)}>
-                  <MapPickerIcon />
+                <Marker key={id} coordinate={{ latitude, longitude }} onPress={() => handleClickMarker(cafe)}>
+                  {selectedCafe && selectedCafe.id === id ? <MapPickerSelectIcon /> : <MapPickerIcon />}
                 </Marker>
               );
             })}
-        </NaverMapView>
-        {/* <FloatingActionButton onPress={() => handleGetLocation()}>
+        </MapView>
+        <FloatingActionButton onPress={() => handleGetLocation()}>
           <LocateActiveIcon />
-        </FloatingActionButton> */}
+        </FloatingActionButton>
         {selectedCafe && (
           <Card>
             <CafeListItem data={selectedCafe} />
