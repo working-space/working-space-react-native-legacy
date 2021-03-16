@@ -51,8 +51,10 @@ export const EditName = styled.TouchableOpacity`
 
 EditName.Text = styled.Text`
   font-size: 18px;
-  text-decoration: underline;
-  padding-right: 8px;
+  margin-right: 8px;
+  border-bottom-width: 1px;
+  border-style: solid;
+  border-color: #222222;
 `;
 
 EditName.Icon = styled.View`
