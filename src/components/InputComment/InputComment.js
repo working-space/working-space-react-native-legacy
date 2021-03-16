@@ -1,23 +1,29 @@
 import React, { useState, useCallback } from 'react';
 import { Container, InputBox } from './InputComment.styles';
-import SmallCloseIcon from '~/assets/icons/icon_small_close.svg';
+import SmallCameraLineIcon from '~/assets/icons/icon_small_camera_line.svg';
 
-const InputComment = ({ onSetComment }) => {
+const InputComment = ({ onSetCommentText, inputRef }) => {
   const [comment, setComment] = useState('');
-  const handleSetComment = useCallback(
+  const handleSetCommentText = useCallback(
     (text) => {
-      onSetComment?.(text);
+      onSetCommentText?.(text);
     },
-    [onSetComment],
+    [onSetCommentText],
   );
 
   return (
     <Container>
       <InputBox>
-        <InputBox.Text placeholder="댓글을 입력하세요" value={comment} onChangeText={(text) => setComment(text)} onSubmitEditing={(event) => handleSetComment(event.nativeEvent.text)} />
-        <InputBox.CancelBtn>
-          <SmallCloseIcon />
-        </InputBox.CancelBtn>
+        <InputBox.Text
+          placeholder="댓글을 입력하세요"
+          value={comment}
+          onChangeText={(text) => setComment(text)}
+          onSubmitEditing={(event) => handleSetCommentText(event.nativeEvent.text)}
+          ref={inputRef}
+        />
+        <InputBox.SubmitBtn>
+          <SmallCameraLineIcon width="18" height="18" />
+        </InputBox.SubmitBtn>
       </InputBox>
     </Container>
   );

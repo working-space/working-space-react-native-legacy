@@ -9,7 +9,6 @@ import { HeaderText, Container, ModalView, Footer, FooterBtn } from './Signup.st
 import SetProfile from '~/components/SetProfile/SetProfile';
 import SetTags from '~/components/SetTags/SetTags';
 import InputText from '~/components/InputText/InputText';
-import { KeyboardAvoidingView } from 'react-native';
 
 const Signup = () => {
   const { AuthStore } = useStore();

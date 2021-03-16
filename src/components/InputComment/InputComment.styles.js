@@ -1,6 +1,6 @@
 import styled from '@emotion/native';
 
-export const Container = styled.View`
+export const Container = styled.KeyboardAvoidingView`
   position: absolute;
   top: 0;
   left: 0;
@@ -29,11 +29,9 @@ InputBox.Text = styled.TextInput`
   color: #222;
 `;
 
-InputBox.CancelBtn = styled.View`
+InputBox.SubmitBtn = styled.TouchableOpacity`
   width: 20px;
   height: 20px;
-  background-color: #ccc;
   padding: 2px;
   margin-left: 16px;
-  border-radius: 20px;
 `;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import Modal from 'react-native-modal';
 import { isEmpty } from 'lodash';
@@ -20,7 +20,6 @@ import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
-import { KeyboardAvoidingView } from 'react-native';
 
 const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const { cardData } = route.params;
@@ -31,12 +30,22 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const [selectPreferTags, setSelectPreferTags] = useState([...userPreferTags]);
   const [toggleFavorite, setToggleFavorite] = useState(false);
   const [toggleBookmark, setToggleBookmark] = useState(false);
+  const [comment, setComment] = useState(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     console.log('preferTags', preferTags);
     console.log('\n');
     console.log('selectPreferTags', selectPreferTags);
   }, [preferTags, selectPreferTags]);
+
+  const handleToggleFavoriteBtn = useCallback(() => {
+    setToggleFavorite(toggleFavorite ? false : true);
+  }, [toggleFavorite]);
+
+  const handleToggleBookmarkBtn = useCallback(() => {
+    setToggleBookmark(toggleBookmark ? false : true);
+  }, [toggleBookmark]);
 
   const handleToggleTag = useCallback((tag) => {
     setPreferTags((prevSelectedTagIds) => {
@@ -51,7 +60,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
     });
   }, []);
 
-  const handleModalEvaluation = useCallback(() => {
+  const handleSetTagsModal = useCallback(() => {
     setVisibleInput('Tags');
   }, []);
 
@@ -65,16 +74,13 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
     setSelectPreferTags([]);
   }, []);
 
-  const handleToggleFavoriteBtn = useCallback(() => {
-    setToggleFavorite(toggleFavorite ? false : true);
-  }, [toggleFavorite]);
-
-  const handleToggleBookmarkBtn = useCallback(() => {
-    setToggleBookmark(toggleBookmark ? false : true);
-  }, [toggleBookmark]);
-
   const handleSetCommentTextModal = useCallback(() => {
     setVisibleInput('Comments');
+  }, []);
+
+  const handleSetCommentText = useCallback(async (text) => {
+    await setComment(text);
+    await setVisibleInput(null);
   }, []);
 
   return (
@@ -104,7 +110,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
         <ImageGrid />
         <DetailInfo address={address} />
         <DetailLocation />
-        <TagList tags={tags} preferTags={preferTags} onModalEvaluation={handleModalEvaluation} />
+        <TagList tags={tags} preferTags={preferTags} onSetTagsModal={handleSetTagsModal} />
         <CommentList onSetCommentTextModal={handleSetCommentTextModal} />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
@@ -131,17 +137,16 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
           </ModalEvaluation.SubmitButton>
         </ModalEvaluation>
       </Modal>
-      <KeyboardAvoidingView>
-        <Modal
-          style={{ width: '100%', margin: 0 }}
-          backdropOpacity={0}
-          isVisible={visibleInput === 'Comments'}
-          onBackButtonPress={handleCloseBtn}
-          hideModalContentWhileAnimating={true}
-          useNativeDriver={true}>
-          <InputComment />
-        </Modal>
-      </KeyboardAvoidingView>
+      <Modal
+        style={{ width: '100%', margin: 0 }}
+        backdropOpacity={0}
+        isVisible={visibleInput === 'Comments'}
+        onBackButtonPress={handleCloseBtn}
+        hideModalContentWhileAnimating={true}
+        useNativeDriver={true}
+        onModalShow={() => inputRef.current.focus()}>
+        <InputComment onSetCommentText={handleSetCommentText} inputRef={inputRef} />
+      </Modal>
     </>
   );
 };

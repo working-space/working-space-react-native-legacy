@@ -20,11 +20,11 @@ const CommentList = (props) => {
           <SmallPersonFillIcon />
           <CommentListBox.Count>{comments.length}</CommentListBox.Count>
         </CommentListBox.Header>
-        <CommentListBox.Input>
+        <CommentListBox.Input onPress={handleCommentTextModal}>
           <ProfileImage>
             <SmallPersonFillIcon />
           </ProfileImage>
-          <CommentText onPress={handleCommentTextModal}>
+          <CommentText>
             <CommentText.Holder>댓글 입력하기</CommentText.Holder>
           </CommentText>
         </CommentListBox.Input>

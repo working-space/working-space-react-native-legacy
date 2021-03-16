@@ -34,7 +34,7 @@ CommentListBox.Count = styled.Text`
   padding-left: 7px;
 `;
 
-CommentListBox.Input = styled.View`
+CommentListBox.Input = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   margin-top: 24px;
@@ -45,7 +45,7 @@ CommentListBox.View = styled.View`
   flex-direction: column;
 `;
 
-export const CommentText = styled.TouchableOpacity`
+export const CommentText = styled.View`
   padding-left: 8px;
 `;
 
