@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import { observer } from 'mobx-react-lite';
 import { isEmpty } from 'lodash';
@@ -21,6 +21,7 @@ const Signup = () => {
   const [nickname, setNickname] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [preferTags, setPreferTags] = useState([]);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -122,11 +123,15 @@ const Signup = () => {
           </FooterBtn>
         </Footer>
       </Container>
-      <KeyboardAvoidingView>
-        <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput} onBackButtonPress={() => setVisibleInput(false)} hideModalContentWhileAnimating={true} useNativeDriver={true}>
-          <InputText defaultText={nickname} onSetNickname={handleSetNickname} />
-        </Modal>
-      </KeyboardAvoidingView>
+      <Modal
+        style={{ width: '100%', margin: 0 }}
+        isVisible={visibleInput}
+        onBackButtonPress={() => setVisibleInput(false)}
+        hideModalContentWhileAnimating={true}
+        useNativeDriver={true}
+        onModalShow={() => inputRef.current.focus()}>
+        <InputText defaultText={nickname} onSetNickname={handleSetNickname} inputRef={inputRef} />
+      </Modal>
     </>
   );
 };
