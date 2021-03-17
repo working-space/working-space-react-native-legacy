@@ -11,7 +11,7 @@ const Navigator = () => {
 
   return (
     <NavigationContainer>
-      {isLoggedIn ? <DrawerNavigator /> : <LoginNavigator />}
+      {isLoggedIn === false ? <DrawerNavigator /> : <LoginNavigator />}
     </NavigationContainer>
   );
 };

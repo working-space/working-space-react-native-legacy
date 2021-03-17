@@ -34,14 +34,25 @@ CommentListBox.Count = styled.Text`
   padding-left: 7px;
 `;
 
-CommentListBox.Input = styled.View`
+CommentListBox.Input = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 24px;
+  margin-bottom: 16px;
 `;
 
 CommentListBox.View = styled.View`
   flex-direction: column;
+`;
+
+export const CommentText = styled.View`
+  padding-left: 8px;
+`;
+
+CommentText.Holder = styled.Text`
+  font-size: 14px;
+  line-height: 20px;
+  color: #a7a7a7;
 `;
 
 export const CommentItem = styled.View`

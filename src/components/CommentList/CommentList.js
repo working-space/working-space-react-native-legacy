@@ -1,11 +1,17 @@
 import React from 'react';
-import { TextInput, Text, TouchableOpacity } from 'react-native';
-import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage } from './CommentList.styles';
+import { Text, TouchableOpacity } from 'react-native';
+import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage, CommentText } from './CommentList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
 import DropdownIcon from '~/assets/icons/icon_dropdown.svg';
+import { useCallback } from 'react';
 
 const CommentList = (props) => {
-  const { comments } = props;
+  const { comments, onSetCommentTextModal } = props;
+
+  const handleCommentTextModal = useCallback(() => {
+    onSetCommentTextModal?.();
+  }, [onSetCommentTextModal]);
+
   return (
     <CommentListWrapper>
       <CommentListBox>
@@ -14,11 +20,13 @@ const CommentList = (props) => {
           <SmallPersonFillIcon />
           <CommentListBox.Count>{comments.length}</CommentListBox.Count>
         </CommentListBox.Header>
-        <CommentListBox.Input>
+        <CommentListBox.Input onPress={handleCommentTextModal}>
           <ProfileImage>
             <SmallPersonFillIcon />
           </ProfileImage>
-          <TextInput style={{ paddingLeft: 8 }} placeholder={'댓글 입력하기'} />
+          <CommentText>
+            <CommentText.Holder>댓글 입력하기</CommentText.Holder>
+          </CommentText>
         </CommentListBox.Input>
         <CommentListBox.View>
           {comments.map((comment, i) => {

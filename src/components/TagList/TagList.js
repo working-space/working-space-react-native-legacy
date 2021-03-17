@@ -5,11 +5,11 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import TagItem from '~/components/TagItem/TagItem';
 
 const TagList = (props) => {
-  const { tags, preferTags, onModalEvaluation } = props;
+  const { tags, preferTags, onSetTagsModal } = props;
 
-  const handleModalEvaluation = useCallback(() => {
-    onModalEvaluation?.();
-  }, [onModalEvaluation]);
+  const handleSetTagsModal = useCallback(() => {
+    onSetTagsModal?.();
+  }, [onSetTagsModal]);
 
   return (
     <TagListWrapper>
@@ -20,7 +20,7 @@ const TagList = (props) => {
             <SmallPersonFillIcon />
             <TagListBox.Count>{tags.length}</TagListBox.Count>
           </TagListBox.Left>
-          <TouchableOpacity onPress={handleModalEvaluation}>
+          <TouchableOpacity onPress={handleSetTagsModal}>
             <TagListBox.Button>평가하기</TagListBox.Button>
           </TouchableOpacity>
         </TagListBox.Header>
