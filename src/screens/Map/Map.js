@@ -1,34 +1,74 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { css } from '@emotion/native';
-import NaverMapView, { Marker } from 'react-native-nmap';
 import { observer } from 'mobx-react-lite';
 import Geolocation from 'react-native-geolocation-service';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+
 import api from '~/api';
+import { Container, SearchInput, Card } from './Map.styles';
 import Header from '~/components/Header/Header';
 import FloatingActionButton from '~/components/FloatingActionButton/FloatingActionButton';
-import { Container, SearchInput, Card } from './Map.styles';
+import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
 import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
-import CurrentLocationIcon from '~/assets/icons/icon_current_location.svg';
 import MapPickerIcon from '~/assets/icons/icon_mappicker.svg';
-import CafeListItem from '../../components/CafeListItem/CafeListItem';
+import MapPickerSelectIcon from '~/assets/icons/icon_mappicker_select.svg';
 
 const Map = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [cafes, setCafes] = useState([]);
-  const [selectedCafe, setSelectedCafe] = useState(null);
+  const [markers, setMarkers] = useState([]);
+  const [selectedMarker, setSelectedMarker] = useState({});
+  const mapRef = useRef();
 
-  const handleClickMarker = ({ name, distance, road_addr }) => {
+  const initialize = () => {
+    setLocation(null);
+    setCafes([]);
+    setMarkers([]);
+    setSelectedMarker({});
+  };
+
+  const getMarkers = useCallback(() => {
+    if (!cafes || cafes.length <= 0) {
+      return;
+    }
+
+    const newMarkers = {};
+
+    cafes.forEach((cafe) => {
+      const [longitude, latitude] = cafe.location.coordinates;
+      const locationKey = `${longitude},${latitude}`;
+
+      if (Object.keys(newMarkers).includes(locationKey)) {
+        newMarkers[locationKey].push(cafe);
+      } else {
+        newMarkers[locationKey] = [cafe];
+      }
+    });
+
+    setMarkers(newMarkers);
+  }, [cafes]);
+
+  const handlePressMarker = (locationKey, { id, name, dist, road_addr }) => {
+    const distance = `${Math.floor(dist.calculated)}m`;
+
     const cafe = {
+      id: id,
       title: name,
       distance,
       address: road_addr,
     };
-    setSelectedCafe(cafe);
+
+    setSelectedMarker({
+      locationKey,
+      cafe,
+    });
   };
 
   const handleGetLocation = useCallback(() => {
+    initialize();
+
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -36,6 +76,7 @@ const Map = ({ navigation }) => {
           latitude,
           longitude,
         });
+        mapRef.current.setCamera({ center: { latitude, longitude } });
       },
       (error) => {
         console.log(error.code, error.message);
@@ -63,6 +104,10 @@ const Map = ({ navigation }) => {
     fetchCafes();
   }, [fetchCafes]);
 
+  useEffect(() => {
+    getMarkers();
+  }, [getMarkers]);
+
   return (
     <>
       <Header
@@ -81,47 +126,46 @@ const Map = ({ navigation }) => {
         <SearchInput onPress={() => navigation.navigate('Search')}>
           <SearchInput.PlaceHolder>현위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
         </SearchInput>
-        <NaverMapView
+
+        <MapView
+          showsUserLocation
+          ref={mapRef}
+          provider={PROVIDER_GOOGLE}
           style={css`
             flex: 1;
           `}
-          showsMyLocationButton={true}
-          zoomControl={false}
-          center={location && { ...location, zoom: 16 }}
-          // onTouch={(e) => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
-          // onCameraChange={(e) =>
-          //   console.warn('onCameraChange', JSON.stringify(e))
-          // }
-          onMapClick={() => setSelectedCafe(null)}>
-          {/* {location && (
-            <Marker
-              coordinate={location}
-              width={36}
-              height={36}
-              // onClick={() => console.warn('onClick! p0')}
-            >
-              <CurrentLocationIcon />
-            </Marker>
-          )} */}
-          {cafes.length > 0 &&
-            cafes.map((cafe) => {
-              const { id, name, road_addr, location, dist } = cafe;
-              const [longitude, latitude] = location.coordinates;
-              const distance = dist.calculated;
+          initialRegion={{
+            latitude: 37.498095,
+            longitude: 127.02761,
+            latitudeDelta: 0.009,
+            longitudeDelta: 0.009,
+          }}
+          onPress={() => setSelectedMarker({})}>
+          {Object.entries(markers).length > 0 &&
+            Object.entries(markers).map((currentMarker) => {
+              const [locationKey, currentCafes] = currentMarker;
+              const [longitude, latitude] = locationKey.split(',').map(Number);
+
+              /*
+               * TODO: 동일한 위치에 카페가 존재할 때, 마커 선택 시 카페를 선택하는 Modal이 나타나도록 구현해야 함
+               * 기능 구현 시, 바로 아래 코드를 활성화시킬 것
+               */
+              // const cafe = currentCafes.length === 1 ? currentCafes[0] : currentCafes;
+              const cafe = currentCafes[0];
 
               return (
-                <Marker key={id} coordinate={{ latitude, longitude }} width={24} height={24} onClick={() => handleClickMarker(cafe)}>
-                  <MapPickerIcon />
+                <Marker key={locationKey} coordinate={{ latitude, longitude }} onPress={() => handlePressMarker(locationKey, cafe)}>
+                  {selectedMarker.locationKey === locationKey ? <MapPickerSelectIcon /> : <MapPickerIcon />}
                 </Marker>
               );
             })}
-        </NaverMapView>
-        {/* <FloatingActionButton onPress={() => handleGetLocation()}>
+        </MapView>
+        <FloatingActionButton onPress={() => handleGetLocation()}>
           <LocateActiveIcon />
-        </FloatingActionButton> */}
-        {selectedCafe && (
+        </FloatingActionButton>
+        {selectedMarker.cafe && (
           <Card>
-            <CafeListItem data={selectedCafe} />
+            <CafeListItem data={selectedMarker.cafe} />
           </Card>
         )}
       </Container>
