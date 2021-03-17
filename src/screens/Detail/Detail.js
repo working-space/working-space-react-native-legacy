@@ -33,12 +33,6 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const [comment, setComment] = useState(null);
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    console.log('preferTags', preferTags);
-    console.log('\n');
-    console.log('selectPreferTags', selectPreferTags);
-  }, [preferTags, selectPreferTags]);
-
   const handleToggleFavoriteBtn = useCallback(() => {
     setToggleFavorite(toggleFavorite ? false : true);
   }, [toggleFavorite]);
@@ -64,6 +58,15 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
     setVisibleInput('Tags');
   }, []);
 
+  const handleSetCommentText = useCallback(async (text) => {
+    await setComment(text);
+    await setVisibleInput(null);
+  }, []);
+
+  const handleSetCommentTextModal = useCallback(() => {
+    setVisibleInput('Comments');
+  }, []);
+
   const handleSubmitBtn = useCallback(() => {
     setVisibleInput(null);
     setSelectPreferTags([]);
@@ -72,15 +75,6 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const handleCloseBtn = useCallback(() => {
     setVisibleInput(null);
     setSelectPreferTags([]);
-  }, []);
-
-  const handleSetCommentTextModal = useCallback(() => {
-    setVisibleInput('Comments');
-  }, []);
-
-  const handleSetCommentText = useCallback(async (text) => {
-    await setComment(text);
-    await setVisibleInput(null);
   }, []);
 
   return (
