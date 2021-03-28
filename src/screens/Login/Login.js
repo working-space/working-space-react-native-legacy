@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import { login, getProfile as getKakaoProfile, KakaoOAuthToken, KakaoProfile, logout, unlink } from '@react-native-seoul/kakao-login';
 import { observer } from 'mobx-react-lite';
 import AutoFitImage from '~/components/AutoFitImage/AutoFitImage';
 import DummyLoginIllustURL from '~/assets/images/dummy_illust.jpg';
@@ -8,22 +8,14 @@ import GoogleButtonIcon from '~/assets/icons/google_button.svg';
 import { HeaderText, Container, Footer, LoginBtn } from './Login.styles';
 
 const Login = ({ navigation }) => {
-  const userData = {
-    token: 'bbongwa@naver.com',
-    nickname: '지원',
-    profileImage: null,
-  };
-
-  const saveToken = async (data) => {
+  const onLogin = async () => {
     try {
-      await AsyncStorage.setItem('UserData', JSON.stringify(data));
-    } catch (err) {
-      console.log(err);
+      const token = await login();
+      const profile = await getKakaoProfile();
+      await navigation.navigate('Signup', { token: token.accessToken, name: profile.nickname, profileImageUrl: profile.profileImageUrl });
+    } catch (error) {
+      console.error(error);
     }
-  };
-  const onLogin = () => {
-    saveToken(userData);
-    navigation.navigate('Signup');
   };
 
   return (
