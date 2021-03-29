@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import { observer } from 'mobx-react-lite';
 import { isEmpty } from 'lodash';
 import * as ImagePicker from 'react-native-image-picker';
@@ -10,13 +9,13 @@ import SetProfile from '~/components/SetProfile/SetProfile';
 import SetTags from '~/components/SetTags/SetTags';
 import InputText from '~/components/InputText/InputText';
 
-const Signup = () => {
+const Signup = ({ route }) => {
+  const { token, name, profileImageUrl } = route.params;
   const { AuthStore } = useStore();
   const { login } = AuthStore;
 
   const [visibleForm, setVisibleForm] = useState('setProfile');
   const [visibleInput, setVisibleInput] = useState(false);
-  const [userData, setUserData] = useState([]);
   const [nickname, setNickname] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [preferTags, setPreferTags] = useState([]);
@@ -25,17 +24,14 @@ const Signup = () => {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const userDataRaw = await AsyncStorage.getItem('UserData');
-        const userDataParse = JSON.parse(userDataRaw);
-        setUserData(userDataParse);
-        setProfileImage(userDataParse.profileImage);
-        setNickname(userDataParse.nickname);
+        setProfileImage(profileImageUrl);
+        setNickname(name);
       } catch (err) {
         console.log(err);
       }
     };
     getUserData();
-  }, []);
+  }, [name, profileImageUrl]);
 
   const handlePrevBtn = () => {
     visibleForm === 'setTags' && setVisibleForm('setProfile');
@@ -44,7 +40,7 @@ const Signup = () => {
   const handleNextBtn = () => {
     visibleForm === 'setProfile' && setVisibleForm('setTags');
     if (visibleForm === 'setTags') {
-      login(userData.token);
+      login(token);
     }
   };
 
