@@ -42,7 +42,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   }, [toggleBookmark]);
 
   const handleToggleTag = useCallback((tag) => {
-    setPreferTags((prevSelectedTagIds) => {
+    setSelectPreferTags((prevSelectedTagIds) => {
       const ids = [...prevSelectedTagIds];
       const index = ids.findIndex((id) => tag.id === id);
       if (index > -1) {
@@ -69,13 +69,13 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 
   const handleSubmitBtn = useCallback(() => {
     setVisibleInput(null);
-    setSelectPreferTags([]);
-  }, []);
+    setPreferTags([...selectPreferTags]);
+  }, [selectPreferTags]);
 
   const handleCloseBtn = useCallback(() => {
     setVisibleInput(null);
-    setSelectPreferTags([]);
-  }, []);
+    setSelectPreferTags([...preferTags]);
+  }, [preferTags]);
 
   return (
     <>
@@ -119,7 +119,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
               <ModalEvaluation.Title>작업공간으로{'\n'}적절한 태그를 선택해주세요!</ModalEvaluation.Title>
             </ModalEvaluation.Bottom>
           </ModalEvaluation.Header>
-          <SetTags preferTags={preferTags.concat(selectPreferTags)} onToggleTag={handleToggleTag} />
+          <SetTags preferTags={selectPreferTags} onToggleTag={handleToggleTag} />
           <ModalEvaluation.SubmitButton
             onPress={handleSubmitBtn}
             style={css`
