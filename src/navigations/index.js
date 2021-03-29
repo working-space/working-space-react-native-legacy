@@ -9,11 +9,7 @@ const Navigator = () => {
   const { AuthStore } = useStore();
   const { isLoggedIn } = AuthStore;
 
-  return (
-    <NavigationContainer>
-      {isLoggedIn === false ? <DrawerNavigator /> : <LoginNavigator />}
-    </NavigationContainer>
-  );
+  return <NavigationContainer>{isLoggedIn ? <DrawerNavigator /> : <LoginNavigator />}</NavigationContainer>;
 };
 
 export default observer(Navigator);
