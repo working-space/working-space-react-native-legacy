@@ -6311,7 +6311,7 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -6399,6 +6399,11 @@ react-native-config@^1.4.2:
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.4.2.tgz#cc39f22ed72c5cb06af1adf0ba70ef01593900b4"
   integrity sha512-iTvCvThvFTH7SdiBcsxYtpLy86zglsh51ZBqFPPZ75tdrQMdlRnDNnb86kNjQf03KT0qs1nCMLRejfPMIim8iA==
 
+react-native-fb-collage@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-fb-collage/-/react-native-fb-collage-1.0.7.tgz#7de412ba2b60e5f4d5e5472b425bccfaee0db94d"
+  integrity sha512-mX6drrEvSQ5cOT8ekPUd05ASY3lzzldbqKHYNmQWTgZ8eLb7ZGNBlEpcM+GZAyuT1rY8KX60ucFVG9tnPC+zfA==
+
 react-native-geolocation-service@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/react-native-geolocation-service/-/react-native-geolocation-service-5.2.0.tgz#eeb1c70cf842e612d68bc3d8706c0fdd917efaf5"
@@ -6459,6 +6464,13 @@ react-native-screens@^2.16.1:
   version "2.16.1"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.16.1.tgz#b105a127378d90018a46daf0c2f6518fca60c06f"
   integrity sha512-WZ7m0sBDVaHbBnlHxwQnUlI6KNfQKHq+Unfw+VBuAlnSXvT+aw6Bb/K2bUlHzBgvrPjwY3Spc7ZERFuTwRLLwg==
+
+react-native-slick@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/react-native-slick/-/react-native-slick-1.6.0.tgz#f0f95e154ea2e1a4c9a0d2646b1b830d39bb9348"
+  integrity sha512-+bnEoJkHYPVKbNi44cwe1/r3RzqK6tKK1tnblCTzr4LMHPY5JctWqtWl8ENN4RUP3fPdF8s/xSKqwLiZ/4gmxg==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-svg-transformer@^0.14.3:
   version "0.14.3"
