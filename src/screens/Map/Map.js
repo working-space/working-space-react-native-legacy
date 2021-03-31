@@ -2,13 +2,15 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { css } from '@emotion/native';
 import { observer } from 'mobx-react-lite';
 import Geolocation from 'react-native-geolocation-service';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 import api from '~/api';
 import { Container, SearchInput, Card } from './Map.styles';
 import Header from '~/components/Header/Header';
 import FloatingActionButton from '~/components/FloatingActionButton/FloatingActionButton';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
+import MapMarker from '~/components/MapMarker/MapMarker';
+import SelectModal from '~/components/SelectModal/SelectModal';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
 import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
@@ -20,6 +22,8 @@ const Map = ({ navigation }) => {
   const [cafes, setCafes] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState({});
+  const [selectingStatus, setSelectingStatus] = useState({ cafes: [], locationKey: '' });
+  const [isSelectModalVisible, setSelectModalVisible] = useState(false);
   const mapRef = useRef();
 
   const initialize = () => {
@@ -27,6 +31,26 @@ const Map = ({ navigation }) => {
     setCafes([]);
     setMarkers([]);
     setSelectedMarker({});
+  };
+
+  const handleSubmitSelectModal = useCallback(
+    (cafe) => {
+      setSelectModalVisible(false);
+      setSelectedMarker({
+        locationKey: selectingStatus.locationKey,
+        cafe: {
+          id: cafe.id,
+          title: cafe.name,
+          distance: cafe.distance,
+          address: cafe.road_addr,
+        },
+      });
+    },
+    [selectingStatus],
+  );
+
+  const toggleModal = () => {
+    setSelectModalVisible((prevState) => !prevState);
   };
 
   const getMarkers = useCallback(() => {
@@ -50,7 +74,14 @@ const Map = ({ navigation }) => {
     setMarkers(newMarkers);
   }, [cafes]);
 
-  const handlePressMarker = (locationKey, { id, name, dist, road_addr }) => {
+  const handlePressMarker = (locationKey, currentCafes) => {
+    if (currentCafes.length > 1) {
+      setSelectModalVisible(true);
+      setSelectingStatus({ cafes: currentCafes, locationKey });
+      return;
+    }
+
+    const { id, name, dist, road_addr } = currentCafes[0];
     const distance = `${Math.floor(dist.calculated)}m`;
 
     const cafe = {
@@ -92,13 +123,53 @@ const Map = ({ navigation }) => {
 
     const { latitude, longitude } = location;
     const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&page=1`);
-
+    console.log(response);
     setCafes(response.data.results);
   }, [location]);
 
   useEffect(() => {
     handleGetLocation();
   }, [handleGetLocation]);
+
+  // const fetchDummyCafes = useCallback(async () => {
+  //   if (!location) {
+  //     return;
+  //   }
+
+  //   setCafes([
+  //     {
+  //       id: '1',
+  //       name: '카페1',
+  //       dist: 1,
+  //       road_addr: '주소',
+  //       location: {
+  //         coordinates: [127.10405890677772, 37.517060642341455],
+  //       },
+  //     },
+  //     {
+  //       id: '2',
+  //       name: '카페2',
+  //       dist: 1,
+  //       road_addr: '주소',
+  //       location: {
+  //         coordinates: [127.10405890677772, 37.517060642341455],
+  //       },
+  //     },
+  //     {
+  //       id: '3',
+  //       name: '카페3',
+  //       dist: 1,
+  //       road_addr: '주소',
+  //       location: {
+  //         coordinates: [127.10320406666568, 37.516645724070926],
+  //       },
+  //     },
+  //   ]);
+  // }, [location]);
+
+  // useEffect(() => {
+  //   fetchDummyCafes();
+  // }, [fetchDummyCafes]);
 
   useEffect(() => {
     fetchCafes();
@@ -151,16 +222,16 @@ const Map = ({ navigation }) => {
                * 기능 구현 시, 바로 아래 코드를 활성화시킬 것
                */
               // const cafe = currentCafes.length === 1 ? currentCafes[0] : currentCafes;
-              const cafe = currentCafes[0];
+              const cafe = currentCafes;
 
               return (
-                <Marker key={locationKey} coordinate={{ latitude, longitude }} onPress={() => handlePressMarker(locationKey, cafe)}>
+                <MapMarker key={locationKey} coordinate={{ latitude, longitude }} onPress={() => handlePressMarker(locationKey, cafe)} tracksViewChanges={false}>
                   {selectedMarker.locationKey === locationKey ? <MapPickerSelectIcon /> : <MapPickerIcon />}
-                </Marker>
+                </MapMarker>
               );
             })}
         </MapView>
-        <FloatingActionButton onPress={() => handleGetLocation()}>
+        <FloatingActionButton onPress={toggleModal}>
           <LocateActiveIcon />
         </FloatingActionButton>
         {selectedMarker.cafe && (
@@ -168,6 +239,7 @@ const Map = ({ navigation }) => {
             <CafeListItem data={selectedMarker.cafe} />
           </Card>
         )}
+        <SelectModal cafes={selectingStatus.cafes} isVisible={isSelectModalVisible} onToggle={toggleModal} onSubmit={handleSubmitSelectModal} />
       </Container>
     </>
   );
