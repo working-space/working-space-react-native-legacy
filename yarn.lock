@@ -6426,11 +6426,6 @@ react-native-modal@^11.7.0:
     prop-types "^15.6.2"
     react-native-animatable "1.3.3"
 
-react-native-nmap@^0.0.58:
-  version "0.0.58"
-  resolved "https://registry.yarnpkg.com/react-native-nmap/-/react-native-nmap-0.0.58.tgz#c73266ee037ff70269e49d8d343e28ba75b4f9b6"
-  integrity sha512-RYzqut22WC66Nv/3z3ypcOWAnmG3agSYc3LjViRECbaz1tIerENs7VUIJl2G0yATBfSjTtuaJdhfAxmVVr9xsw==
-
 react-native-reanimated@^1.13.2:
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.13.2.tgz#1ae5457b24b4913d173a5a064bb28eae7783d293"

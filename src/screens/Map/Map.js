@@ -26,7 +26,7 @@ const Map = ({ navigation }) => {
   const [isSelectModalVisible, setSelectModalVisible] = useState(false);
   const mapRef = useRef();
 
-  const initialize = () => {
+  const initializeMapScreen = () => {
     setLocation(null);
     setCafes([]);
     setMarkers([]);
@@ -98,7 +98,7 @@ const Map = ({ navigation }) => {
   };
 
   const handleGetLocation = useCallback(() => {
-    initialize();
+    initializeMapScreen();
 
     Geolocation.getCurrentPosition(
       (position) => {
