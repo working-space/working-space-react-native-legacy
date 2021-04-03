@@ -15,7 +15,7 @@ const DetailTitle = (props) => {
         </TitleInfo.Item>
         <TitleInfo.Item style={{ paddingRight: 8 }}>
           <SmallTagIcon />
-          <TitleInfo.Text>태그 {tags.length}개</TitleInfo.Text>
+          <TitleInfo.Text>태그 {tags?.length ? tags.length : '0'}개</TitleInfo.Text>
         </TitleInfo.Item>
       </TitleInfo>
     </DetailTitleWrapper>
@@ -24,6 +24,8 @@ const DetailTitle = (props) => {
 
 DetailTitle.defaultProps = {
   title: 'Cafe',
+  distance: '',
+  tags: [],
 };
 
 export default DetailTitle;

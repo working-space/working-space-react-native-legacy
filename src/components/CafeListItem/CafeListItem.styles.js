@@ -8,8 +8,10 @@ const row = css`
 export const Item = styled.TouchableOpacity`
   position: relative;
   width: 100%;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
+  border-width: ${({ noBorder }) => (noBorder ? '0' : '1px')};
+  border-style: solid;
+  border-color: #e5e5e5;
+  border-radius: ${({ noBorder }) => (noBorder ? '0' : '4px')};
   padding: 16px;
   background-color: white;
 `;

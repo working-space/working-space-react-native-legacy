@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList } from 'react-native';
 import { css } from '@emotion/native';
 import { Item } from './CafeListItem.styles';
 import TAG from '~/constants/tag';
@@ -9,7 +9,7 @@ import CommentIcon from '~/assets/icons/icon_comment.svg';
 import EditIcon from '~/assets/icons/icon_edit.svg';
 
 const CafeListItem = (props) => {
-  const { onCardLinkClick } = props;
+  const { noBorder, onCardLinkClick } = props;
   const { title, distance, address, tags, badges, favoriteCount, commentCount } = props.data;
 
   const [tagList, setTagList] = useState([]);
@@ -39,7 +39,7 @@ const CafeListItem = (props) => {
   }, [getTagList]);
 
   return (
-    <Item onPress={handleCardLinkClick}>
+    <Item onPress={handleCardLinkClick} noBorder={noBorder}>
       <Item.BadgeList>
         {badges &&
           badges.length > 0 &&
