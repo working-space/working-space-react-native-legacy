@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { isEmpty } from 'lodash';
 import * as ImagePicker from 'react-native-image-picker';
@@ -9,33 +8,30 @@ import { HeaderText, Container, ModalView, Footer, FooterBtn } from './Signup.st
 import SetProfile from '~/components/SetProfile/SetProfile';
 import SetTags from '~/components/SetTags/SetTags';
 import InputText from '~/components/InputText/InputText';
-import { KeyboardAvoidingView } from 'react-native';
 
-const Signup = () => {
+const Signup = ({ route }) => {
+  const { token, name, profileImageUrl } = route.params;
   const { AuthStore } = useStore();
   const { login } = AuthStore;
 
   const [visibleForm, setVisibleForm] = useState('setProfile');
   const [visibleInput, setVisibleInput] = useState(false);
-  const [userData, setUserData] = useState([]);
   const [nickname, setNickname] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [preferTags, setPreferTags] = useState([]);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const userDataRaw = await AsyncStorage.getItem('UserData');
-        const userDataParse = JSON.parse(userDataRaw);
-        setUserData(userDataParse);
-        setProfileImage(userDataParse.profileImage);
-        setNickname(userDataParse.nickname);
+        setProfileImage(profileImageUrl);
+        setNickname(name);
       } catch (err) {
         console.log(err);
       }
     };
     getUserData();
-  }, []);
+  }, [name, profileImageUrl]);
 
   const handlePrevBtn = () => {
     visibleForm === 'setTags' && setVisibleForm('setProfile');
@@ -44,7 +40,7 @@ const Signup = () => {
   const handleNextBtn = () => {
     visibleForm === 'setProfile' && setVisibleForm('setTags');
     if (visibleForm === 'setTags') {
-      login(userData.token);
+      login(token);
     }
   };
 
@@ -122,11 +118,15 @@ const Signup = () => {
           </FooterBtn>
         </Footer>
       </Container>
-      <KeyboardAvoidingView>
-        <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput} onBackButtonPress={() => setVisibleInput(false)} hideModalContentWhileAnimating={true} useNativeDriver={true}>
-          <InputText defaultText={nickname} onSetNickname={handleSetNickname} />
-        </Modal>
-      </KeyboardAvoidingView>
+      <Modal
+        style={{ width: '100%', margin: 0 }}
+        isVisible={visibleInput}
+        onBackButtonPress={() => setVisibleInput(false)}
+        hideModalContentWhileAnimating={true}
+        useNativeDriver={true}
+        onModalShow={() => inputRef.current.focus()}>
+        <InputText defaultText={nickname} onSetNickname={handleSetNickname} inputRef={inputRef} />
+      </Modal>
     </>
   );
 };
