@@ -23,10 +23,14 @@ SearchInput.PlaceHolder = styled.Text`
   color: #a7a7a7;
 `;
 
-export const Card = styled.View`
+export const BottomView = styled.View`
+  left: 0;
+  width: 100%;
   position: absolute;
   bottom: 0;
-  left: 0;
+`;
+
+export const Card = styled.View`
   width: 100%;
   background-color: #ffffff;
   z-index: 99;

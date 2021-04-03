@@ -1,9 +1,10 @@
 import styled from '@emotion/native';
 
 export const Button = styled.TouchableOpacity`
-  position: absolute;
   bottom: 16px;
   right: 16px;
+  align-self: flex-end;
+  position: relative;
   padding: 10px;
   background-color: #ffffff;
   border-radius: 40px;
