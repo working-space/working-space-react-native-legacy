@@ -29,12 +29,9 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
 
         google()
         jcenter()
-        maven {
-            url 'https://naver.jfrog.io/artifactory/maven/'
-        }
-        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
     }
 }

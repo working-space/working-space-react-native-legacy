@@ -2,31 +2,68 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { css } from '@emotion/native';
 import { observer } from 'mobx-react-lite';
 import Geolocation from 'react-native-geolocation-service';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 import api from '~/api';
-import { Container, SearchInput, Card } from './Map.styles';
+import { Container, SearchInput, Card, BottomView } from './Map.styles';
 import Header from '~/components/Header/Header';
 import FloatingActionButton from '~/components/FloatingActionButton/FloatingActionButton';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
+import MapMarker from '~/components/MapMarker/MapMarker';
+import SelectModal from '~/components/SelectModal/SelectModal';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
 import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
-import MapPickerIcon from '~/assets/icons/icon_mappicker.svg';
-import MapPickerSelectIcon from '~/assets/icons/icon_mappicker_select.svg';
+import MapPickerImage from '~/assets/icons/icon_mappicker.png';
+import MapPickerSelectImage from '~/assets/icons/icon_mappicker_select.png';
 
 const Map = ({ navigation }) => {
-  const [location, setLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
   const [cafes, setCafes] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState({});
+  const [selectingStatus, setSelectingStatus] = useState({ cafes: [], locationKey: '' });
+  const [isSelectModalVisible, setSelectModalVisible] = useState(false);
   const mapRef = useRef();
 
-  const initialize = () => {
-    setLocation(null);
+  const initializeMapScreen = () => {
+    setCurrentLocation(null);
     setCafes([]);
     setMarkers([]);
     setSelectedMarker({});
+  };
+
+  const selectMarker = (locationKey, currentCafe) => {
+    const { id, name, dist, road_addr, tags, location } = currentCafe;
+    const distance = `${Math.floor(dist.calculated)}m`;
+    const [longitude, latitude] = location.coordinates;
+
+    const cafe = {
+      id: id,
+      title: name,
+      distance,
+      address: road_addr,
+      tags,
+    };
+
+    setSelectedMarker({
+      locationKey,
+      cafe,
+    });
+
+    mapRef.current.animateCamera({ center: { latitude: latitude - 0.0007, longitude } });
+  };
+
+  const handleSubmitSelectModal = useCallback(
+    (cafe) => {
+      setSelectModalVisible(false);
+      selectMarker(selectingStatus.locationKey, cafe);
+    },
+    [selectingStatus],
+  );
+
+  const toggleModal = () => {
+    setSelectModalVisible((prevState) => !prevState);
   };
 
   const getMarkers = useCallback(() => {
@@ -50,29 +87,30 @@ const Map = ({ navigation }) => {
     setMarkers(newMarkers);
   }, [cafes]);
 
-  const handlePressMarker = (locationKey, { id, name, dist, road_addr }) => {
-    const distance = `${Math.floor(dist.calculated)}m`;
+  const handlePressMarker = (locationKey, currentCafes) => {
+    if (currentCafes.length > 1) {
+      setSelectModalVisible(true);
+      setSelectingStatus({ cafes: currentCafes, locationKey });
+      return;
+    }
 
-    const cafe = {
-      id: id,
-      title: name,
-      distance,
-      address: road_addr,
-    };
-
-    setSelectedMarker({
-      locationKey,
-      cafe,
-    });
+    selectMarker(locationKey, currentCafes[0]);
   };
 
+  const handlePressCafeListItem = useCallback(
+    (card) => {
+      navigation.navigate('Detail', { cardData: card });
+    },
+    [navigation],
+  );
+
   const handleGetLocation = useCallback(() => {
-    initialize();
+    initializeMapScreen();
 
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        setLocation({
+        setCurrentLocation({
           latitude,
           longitude,
         });
@@ -86,15 +124,14 @@ const Map = ({ navigation }) => {
   }, []);
 
   const fetchCafes = useCallback(async () => {
-    if (!location) {
+    if (!currentLocation) {
       return;
     }
 
-    const { latitude, longitude } = location;
+    const { latitude, longitude } = currentLocation;
     const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&page=1`);
-
     setCafes(response.data.results);
-  }, [location]);
+  }, [currentLocation]);
 
   useEffect(() => {
     handleGetLocation();
@@ -128,7 +165,11 @@ const Map = ({ navigation }) => {
         </SearchInput>
 
         <MapView
-          showsUserLocation
+          cacheEnabled={true}
+          loadingEnabled={true}
+          showsCompass={true}
+          showsUserLocation={true}
+          moveOnMarkerPress={false}
           ref={mapRef}
           provider={PROVIDER_GOOGLE}
           style={css`
@@ -141,33 +182,35 @@ const Map = ({ navigation }) => {
             longitudeDelta: 0.009,
           }}
           onPress={() => setSelectedMarker({})}>
-          {Object.entries(markers).length > 0 &&
+          {markers &&
             Object.entries(markers).map((currentMarker) => {
               const [locationKey, currentCafes] = currentMarker;
               const [longitude, latitude] = locationKey.split(',').map(Number);
-
-              /*
-               * TODO: 동일한 위치에 카페가 존재할 때, 마커 선택 시 카페를 선택하는 Modal이 나타나도록 구현해야 함
-               * 기능 구현 시, 바로 아래 코드를 활성화시킬 것
-               */
-              // const cafe = currentCafes.length === 1 ? currentCafes[0] : currentCafes;
-              const cafe = currentCafes[0];
+              const cafe = currentCafes;
 
               return (
-                <Marker key={locationKey} coordinate={{ latitude, longitude }} onPress={() => handlePressMarker(locationKey, cafe)}>
-                  {selectedMarker.locationKey === locationKey ? <MapPickerSelectIcon /> : <MapPickerIcon />}
-                </Marker>
+                <MapMarker
+                  key={locationKey}
+                  coordinate={{ latitude, longitude }}
+                  image={selectedMarker.locationKey === locationKey ? MapPickerSelectImage : MapPickerImage}
+                  onPress={() => handlePressMarker(locationKey, cafe)}
+                  tracksViewChanges={true}
+                  stopPropagation={true}
+                />
               );
             })}
         </MapView>
-        <FloatingActionButton onPress={() => handleGetLocation()}>
-          <LocateActiveIcon />
-        </FloatingActionButton>
-        {selectedMarker.cafe && (
-          <Card>
-            <CafeListItem data={selectedMarker.cafe} />
-          </Card>
-        )}
+        <BottomView>
+          <FloatingActionButton onPress={handleGetLocation}>
+            <LocateActiveIcon />
+          </FloatingActionButton>
+          {selectedMarker.cafe && (
+            <Card>
+              <CafeListItem noBorder={true} data={selectedMarker.cafe} onCardLinkClick={() => handlePressCafeListItem(selectedMarker.cafe)} />
+            </Card>
+          )}
+        </BottomView>
+        <SelectModal cafes={selectingStatus.cafes} isVisible={isSelectModalVisible} onToggle={toggleModal} onSubmit={handleSubmitSelectModal} />
       </Container>
     </>
   );
