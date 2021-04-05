@@ -112,7 +112,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
           <ModalEvaluation.Header>
             <ModalEvaluation.Top>
               <ModalEvaluation.CloseButton onPress={handleCloseBtn}>
-                <CloseIcon />
+                <CloseIcon style={{ fill: '#222' }} />
               </ModalEvaluation.CloseButton>
             </ModalEvaluation.Top>
             <ModalEvaluation.Bottom>

@@ -54,7 +54,7 @@ const CafeListItem = (props) => {
         <Item.HeaderRight>
           {distance && (
             <>
-              <LocationIcon />
+              <LocationIcon style={{ fill: '#222' }} />
               <Item.Distance>{distance}</Item.Distance>
             </>
           )}
