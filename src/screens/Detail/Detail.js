@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
+import { Share } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import Modal from 'react-native-modal';
 import { isEmpty } from 'lodash';
@@ -33,16 +34,36 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const [comment, setComment] = useState(null);
   const inputRef = useRef(null);
 
-  const handleToggleFavoriteBtn = useCallback(() => {
+  const handleToggleFavoriteButton = useCallback(() => {
     setToggleFavorite(toggleFavorite ? false : true);
   }, [toggleFavorite]);
 
-  const handleToggleBookmarkBtn = useCallback(() => {
+  const handleToggleBookmarkButton = useCallback(() => {
     setToggleBookmark(toggleBookmark ? false : true);
   }, [toggleBookmark]);
 
+  const handleShareButton = async () => {
+    try {
+      const result = await Share.share({
+        title: title,
+        message: '작업하기 좋은 카페를 추천합니다!',
+      });
+      if (result.action === Share.shareAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   const handleToggleTag = useCallback((tag) => {
-    setPreferTags((prevSelectedTagIds) => {
+    setSelectPreferTags((prevSelectedTagIds) => {
       const ids = [...prevSelectedTagIds];
       const index = ids.findIndex((id) => tag.id === id);
       if (index > -1) {
@@ -69,13 +90,13 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 
   const handleSubmitBtn = useCallback(() => {
     setVisibleInput(null);
-    setSelectPreferTags([]);
-  }, []);
+    setPreferTags([...selectPreferTags]);
+  }, [selectPreferTags]);
 
   const handleCloseBtn = useCallback(() => {
     setVisibleInput(null);
-    setSelectPreferTags([]);
-  }, []);
+    setSelectPreferTags([...preferTags]);
+  }, [preferTags]);
 
   return (
     <>
@@ -88,12 +109,12 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
         }
         right={
           <LinkIconWrapper>
-            <LinkIconWrapper.Item onPress={handleToggleFavoriteBtn}>
+            <LinkIconWrapper.Item onPress={handleToggleFavoriteButton}>
               {toggleFavorite ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
               <LinkIconWrapper.Text>{like + toggleFavorite}</LinkIconWrapper.Text>
             </LinkIconWrapper.Item>
-            <LinkIconWrapper.Item onPress={handleToggleBookmarkBtn}>{toggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}</LinkIconWrapper.Item>
-            <LinkIconWrapper.Item>
+            <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>{toggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}</LinkIconWrapper.Item>
+            <LinkIconWrapper.Item onPress={handleShareButton}>
               <ShareIcon width="24" height="24" />
             </LinkIconWrapper.Item>
           </LinkIconWrapper>
@@ -112,14 +133,14 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
           <ModalEvaluation.Header>
             <ModalEvaluation.Top>
               <ModalEvaluation.CloseButton onPress={handleCloseBtn}>
-                <CloseIcon />
+                <CloseIcon style={{ fill: '#222' }} />
               </ModalEvaluation.CloseButton>
             </ModalEvaluation.Top>
             <ModalEvaluation.Bottom>
               <ModalEvaluation.Title>작업공간으로{'\n'}적절한 태그를 선택해주세요!</ModalEvaluation.Title>
             </ModalEvaluation.Bottom>
           </ModalEvaluation.Header>
-          <SetTags preferTags={preferTags.concat(selectPreferTags)} onToggleTag={handleToggleTag} />
+          <SetTags preferTags={selectPreferTags} onToggleTag={handleToggleTag} />
           <ModalEvaluation.SubmitButton
             onPress={handleSubmitBtn}
             style={css`
@@ -146,6 +167,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 };
 
 Detail.defaultProps = {
+  title: 'Cafe',
   like: 23,
   userPreferTags: ['CLEAN_TOILET', 'STUDY_ROOM', 'VARIOUS_DESSERTS', 'SMOKING'],
 };

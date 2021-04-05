@@ -10,11 +10,11 @@ const DetailTitle = (props) => {
       <HeadTitle>{title}</HeadTitle>
       <TitleInfo>
         <TitleInfo.Item style={{ paddingRight: 8 }}>
-          <SmallLocationIcon />
+          <SmallLocationIcon style={{ fill: '#222' }} />
           <TitleInfo.Text>{distance}</TitleInfo.Text>
         </TitleInfo.Item>
         <TitleInfo.Item style={{ paddingRight: 8 }}>
-          <SmallTagIcon />
+          <SmallTagIcon style={{ fill: '#222' }} />
           <TitleInfo.Text>태그 {tags?.length ? tags.length : '0'}개</TitleInfo.Text>
         </TitleInfo.Item>
       </TitleInfo>

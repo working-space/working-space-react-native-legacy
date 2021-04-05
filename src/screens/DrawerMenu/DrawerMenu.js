@@ -21,7 +21,7 @@ const DrawerMenu = ({ navigation }) => {
       <Header
         left={
           <Header.Button onPress={navigation.closeDrawer}>
-            <CloseIcon />
+            <CloseIcon style={{ fill: '#222' }} />
           </Header.Button>
         }
         right={
