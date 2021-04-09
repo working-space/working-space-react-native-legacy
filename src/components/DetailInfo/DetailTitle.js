@@ -22,10 +22,4 @@ const DetailTitle = (props) => {
   );
 };
 
-DetailTitle.defaultProps = {
-  title: 'Cafe',
-  distance: '',
-  tags: [],
-};
-
 export default DetailTitle;

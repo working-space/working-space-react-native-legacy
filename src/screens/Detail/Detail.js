@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { Share } from 'react-native';
-import { observer } from 'mobx-react-lite';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Share, Text } from 'react-native';
 import Modal from 'react-native-modal';
-import { isEmpty } from 'lodash';
 import { css } from '@emotion/native';
+import { isEmpty } from 'lodash';
+import { observer } from 'mobx-react-lite';
 import { DetailWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
 import Header from '~/components/Header/Header';
 import DetailTitle from '~/components/DetailInfo/DetailTitle';
@@ -21,11 +21,13 @@ import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
+import api from '~/api';
 
-const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
-  const { cardData } = route.params;
-  const { title, distance, tags, address } = cardData;
+const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } }) => {
+  const { cafeId } = route.params;
 
+  const [cafeData, setCafeData] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferTags, setPreferTags] = useState([...userPreferTags]);
   const [selectPreferTags, setSelectPreferTags] = useState([...userPreferTags]);
@@ -33,6 +35,21 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const [toggleBookmark, setToggleBookmark] = useState(false);
   const [comment, setComment] = useState(null);
   const inputRef = useRef(null);
+
+  const getCafeDetail = async () => {
+    const result = await api.get('/cafes/daum-402974200/');
+    return result.data;
+  };
+
+  useEffect(() => {
+    cafeData === null && setLoading(true);
+    getCafeDetail()
+      .then((cafe) => {
+        loading && setCafeData(cafe);
+        setLoading(false);
+      })
+      .catch((error) => console.log(error));
+  }, [cafeData, loading]);
 
   const handleToggleFavoriteButton = useCallback(() => {
     setToggleFavorite(toggleFavorite ? false : true);
@@ -45,7 +62,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const handleShareButton = async () => {
     try {
       const result = await Share.share({
-        title: title,
+        title: cafeData.name,
         message: '작업하기 좋은 카페를 추천합니다!',
       });
       if (result.action === Share.shareAction) {
@@ -98,7 +115,9 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
     setSelectPreferTags([...preferTags]);
   }, [preferTags]);
 
-  return (
+  return cafeData === null || loading ? (
+    <Text>로딩중</Text>
+  ) : (
     <>
       <Header
         showBorderBottom={true}
@@ -121,12 +140,12 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
         }
       />
       <DetailWrapper>
-        <DetailTitle title={title} distance={distance} tags={tags} />
-        <ImageGrid />
-        <DetailInfo address={address} />
+        <DetailTitle title={cafeData.name} distance={distance} tags={cafeData.tags} />
+        <ImageGrid title={cafeData.name} distance={distance} tags={cafeData.tags} />
+        <DetailInfo address={cafeData.parcel_addr} phone={cafeData.phone} />
         <DetailLocation />
-        <TagList tags={tags} preferTags={preferTags} onSetTagsModal={handleSetTagsModal} />
-        <CommentList onSetCommentTextModal={handleSetCommentTextModal} />
+        <TagList tags={cafeData.tags} preferTags={preferTags} onSetTagsModal={handleSetTagsModal} />
+        <CommentList comments={cafeData.comments} onSetCommentTextModal={handleSetCommentTextModal} />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
         <ModalEvaluation>
@@ -167,7 +186,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 };
 
 Detail.defaultProps = {
-  title: 'Cafe',
+  distance: '2.2km',
   like: 23,
   userPreferTags: ['CLEAN_TOILET', 'STUDY_ROOM', 'VARIOUS_DESSERTS', 'SMOKING'],
 };
