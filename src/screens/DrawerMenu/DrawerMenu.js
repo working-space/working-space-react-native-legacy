@@ -1,13 +1,7 @@
 import React from 'react';
 import { View, Button } from 'react-native';
 import Header from '~/components/Header/Header';
-import {
-  Container,
-  Profile,
-  FavoriteTags,
-  Tag,
-  Menu,
-} from './DrawerMenu.styles';
+import { Container, Profile, FavoriteTags, Tag, Menu } from './DrawerMenu.styles';
 import TAG from '~/constants/tag';
 import CloseIcon from '~/assets/icons/icon_close.svg';
 import SettingIcon from '~/assets/icons/icon_setting.svg';
@@ -41,37 +35,8 @@ const DrawerMenu = ({ navigation }) => {
             <FavoriteTags.Title>나의 선호 태그</FavoriteTags.Title>
             <FavoriteTags.Menu>수정하기</FavoriteTags.Menu>
           </FavoriteTags.Header>
-          <FavoriteTags.List>
-            <Tag>
-              <Tag.Icon>{TAG.CONCENT.icon}</Tag.Icon>
-              <Tag.Name>{TAG.CONCENT.name}</Tag.Name>
-            </Tag>
-            <Tag.SeparatorContainer>
-              <Tag.Separator />
-            </Tag.SeparatorContainer>
-            <Tag>
-              <Tag.Icon>{TAG.TWENTY_FOUR.icon}</Tag.Icon>
-              <Tag.Name>{TAG.TWENTY_FOUR.name}</Tag.Name>
-            </Tag>
-            <Tag.SeparatorContainer>
-              <Tag.Separator />
-            </Tag.SeparatorContainer>
-            <Tag>
-              <Tag.Icon>{TAG.CLEAN_TOILET.icon}</Tag.Icon>
-              <Tag.Name>{TAG.CLEAN_TOILET.name}</Tag.Name>
-            </Tag>
-            <Tag.SeparatorContainer>
-              <Tag.Separator />
-            </Tag.SeparatorContainer>
-            <Tag>
-              <Tag.Icon>{TAG.VARIOUS_DESSERTS.icon}</Tag.Icon>
-              <Tag.Name>{TAG.VARIOUS_DESSERTS.name}</Tag.Name>
-            </Tag>
-          </FavoriteTags.List>
           <FavoriteTags.List empty>
-            <FavoriteTags.EmptyText>
-              등록된 태그가 없습니다.
-            </FavoriteTags.EmptyText>
+            <FavoriteTags.EmptyText>등록된 태그가 없습니다.</FavoriteTags.EmptyText>
           </FavoriteTags.List>
         </FavoriteTags>
         <Menu>
