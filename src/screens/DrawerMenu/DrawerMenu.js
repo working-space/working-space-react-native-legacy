@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Button } from 'react-native';
+import React, { Fragment } from 'react';
 import Header from '~/components/Header/Header';
 import { Container, Profile, FavoriteTags, Tag, Menu } from './DrawerMenu.styles';
 import TAG from '~/constants/tag';
@@ -8,6 +7,8 @@ import SettingIcon from '~/assets/icons/icon_setting.svg';
 import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import CommentMenuIcon from '~/assets/icons/icon_comment_menu.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
+
+const favoriteTags = [TAG.CONCENT, TAG.TWENTY_FOUR, TAG.CLEAN_TOILET, TAG.VARIOUS_DESSERTS];
 
 const DrawerMenu = ({ navigation }) => {
   return (
@@ -35,6 +36,22 @@ const DrawerMenu = ({ navigation }) => {
             <FavoriteTags.Title>나의 선호 태그</FavoriteTags.Title>
             <FavoriteTags.Menu>수정하기</FavoriteTags.Menu>
           </FavoriteTags.Header>
+          <FavoriteTags.List empty={favoriteTags.length <= 0}>
+            {favoriteTags.length > 0 &&
+              favoriteTags.map((tag, index) => (
+                <Fragment key={tag.name}>
+                  <Tag>
+                    <Tag.Icon>{tag.icon}</Tag.Icon>
+                    <Tag.Name>{tag.name}</Tag.Name>
+                  </Tag>
+                  {favoriteTags.length - 1 !== index && (
+                    <Tag.SeparatorContainer>
+                      <Tag.Separator />
+                    </Tag.SeparatorContainer>
+                  )}
+                </Fragment>
+              ))}
+          </FavoriteTags.List>
           <FavoriteTags.List empty>
             <FavoriteTags.EmptyText>등록된 태그가 없습니다.</FavoriteTags.EmptyText>
           </FavoriteTags.List>
