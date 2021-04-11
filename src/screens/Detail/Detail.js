@@ -36,20 +36,24 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
   const [comment, setComment] = useState(null);
   const inputRef = useRef(null);
 
-  const getCafeDetail = async () => {
-    const result = await api.get('/cafes/daum-402974200/');
-    return result.data;
+  const getCafeDetail = async (id) => {
+    try {
+      const result = await api.get(`/cafes/${id}/`);
+      return result.data;
+    } catch (error) {
+      console.warn(error);
+    }
   };
 
   useEffect(() => {
     cafeData === null && setLoading(true);
-    getCafeDetail()
+    getCafeDetail(cafeId)
       .then((cafe) => {
         loading && setCafeData(cafe);
         setLoading(false);
       })
       .catch((error) => console.log(error));
-  }, [cafeData, loading]);
+  }, [cafeData, loading, cafeId]);
 
   const handleToggleFavoriteButton = useCallback(() => {
     setToggleFavorite(toggleFavorite ? false : true);

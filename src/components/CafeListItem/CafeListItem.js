@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FlatList } from 'react-native';
 import { css } from '@emotion/native';
+import { isEmpty } from 'lodash';
 import { Item } from './CafeListItem.styles';
 import TAG from '~/constants/tag';
 import LocationIcon from '~/assets/icons/icon_small_location_fill.svg';
@@ -19,7 +20,9 @@ const CafeListItem = (props) => {
   }, [onCardLinkClick, props.data]);
 
   const getTagList = useCallback(() => {
-    if (!tags || tags.length <= 0) return;
+    if (isEmpty(tags) || tags.length <= 0) {
+      return;
+    }
 
     const CUT_LINE = 2;
 

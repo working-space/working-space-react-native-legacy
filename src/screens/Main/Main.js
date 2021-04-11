@@ -59,8 +59,8 @@ const Main = ({ navigation }) => {
   }, []);
 
   const handleCardLinkClick = useCallback(
-    (card) => {
-      navigation.navigate('Detail', { cardData: card });
+    (cafe) => {
+      navigation.navigate('Detail', { cafeId: cafe.id });
     },
     [navigation],
   );
