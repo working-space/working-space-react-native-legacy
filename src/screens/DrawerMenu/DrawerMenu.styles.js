@@ -3,7 +3,8 @@ import styled from '@emotion/native';
 export const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
-  margin: 56px 16px;
+  margin-top: 56px;
+  padding: 0 16px;
   z-index: 1;
 `;
 

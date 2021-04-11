@@ -13,62 +13,62 @@ import WifiIcon from '~/assets/icons/icon_wifi.svg';
 import ChairIcon from '~/assets/icons/icon_chair.svg';
 
 const TAG = {
-  CONCENT: {
+  concent: {
     id: 'concent',
     name: '콘센트가 있는',
     icon: <ConcentIcon />,
   },
-  QUIET: {
+  mute: {
     id: 'mute',
     name: '분위기가 조용한',
     icon: <QuietIcon />,
   },
-  PARKING_LOT: {
+  parking: {
     id: 'parking',
     name: '주차장이 있는',
     icon: <ParkingLotIcon />,
   },
-  CLEAN_TOILET: {
+  toilet: {
     id: 'toilet',
     name: '화장실이 깨끗한',
     icon: <ToiletIcon />,
   },
-  TWENTY_FOUR: {
+  twentyFour: {
     id: 'twentyFour',
     name: '24시간 열린',
     icon: <TwentyFourIcon />,
   },
-  STUDY_ROOM: {
+  study: {
     id: 'study',
     name: '스터디룸이 있는',
     icon: <StudyIcon />,
   },
-  VARIOUS_DESSERTS: {
+  dessert: {
     id: 'dessert',
     name: '디저트가 다양한',
     icon: <DessertIcon />,
   },
-  SMOKING: {
+  smoking: {
     id: 'smoking',
     name: '흡연구역이 마련된',
     icon: <SmokingIcon />,
   },
-  TIME_LIMIT: {
+  timer: {
     id: 'timer',
     name: '시간제한이 있는',
     icon: <TimerIcon />,
   },
-  MANY_SEATS: {
+  seat: {
     id: 'seat',
     name: '빈자리가 많은',
     icon: <SeatIcon />,
   },
-  FAST_WIFI: {
+  wifi: {
     id: 'wifi',
     name: '와이파이가 빠른',
     icon: <WifiIcon />,
   },
-  FLUFFY_CHAIR: {
+  chair: {
     id: 'chair',
     name: '의자가 푹신한',
     icon: <ChairIcon />,
