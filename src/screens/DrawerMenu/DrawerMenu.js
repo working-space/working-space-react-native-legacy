@@ -8,7 +8,7 @@ import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import CommentMenuIcon from '~/assets/icons/icon_comment_menu.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 
-const favoriteTags = [TAG.CONCENT, TAG.TWENTY_FOUR, TAG.CLEAN_TOILET, TAG.VARIOUS_DESSERTS];
+const favoriteTags = [TAG.concent, TAG.twentyFour, TAG.toilet, TAG.dessert];
 
 const DrawerMenu = ({ navigation }) => {
   return (
@@ -37,7 +37,7 @@ const DrawerMenu = ({ navigation }) => {
             <FavoriteTags.Menu>수정하기</FavoriteTags.Menu>
           </FavoriteTags.Header>
           <FavoriteTags.List empty={favoriteTags.length <= 0}>
-            {favoriteTags.length > 0 &&
+            {favoriteTags &&
               favoriteTags.map((tag, index) => (
                 <Fragment key={tag.name}>
                   <Tag>
@@ -51,9 +51,7 @@ const DrawerMenu = ({ navigation }) => {
                   )}
                 </Fragment>
               ))}
-          </FavoriteTags.List>
-          <FavoriteTags.List empty>
-            <FavoriteTags.EmptyText>등록된 태그가 없습니다.</FavoriteTags.EmptyText>
+            {favoriteTags.length <= 0 && <FavoriteTags.EmptyText>등록된 태그가 없습니다.</FavoriteTags.EmptyText>}
           </FavoriteTags.List>
         </FavoriteTags>
         <Menu>
