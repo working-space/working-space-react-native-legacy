@@ -1,6 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { FlatList, View } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FlatList, View, Text } from 'react-native';
+import { css } from '@emotion/native';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
+
+import { requestPermissions } from '~/utils/permission';
 import useStore from '~/hooks/useStore';
 import Header from '~/components/Header/Header';
 import AutoFitImage from '~/components/AutoFitImage/AutoFitImage';
@@ -11,140 +15,23 @@ import dummyIllustURL from '~/assets/images/dummy_illust.jpg';
 import MenuIcon from '~/assets/icons/icon_menu.svg';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
-import { css } from '@emotion/native';
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
 const Main = ({ navigation }) => {
-  const { AuthStore } = useStore();
+  const { AuthStore, CafeListStore, GeoLocationStore } = useStore();
   const { logout } = AuthStore;
+  const { fetchCafeList, isFetching, fetchedCafeList } = CafeListStore;
+  const { latitude, longitude, getCurrentLocation } = GeoLocationStore;
+
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
   const [showScrolledListHeader, setShowScrolledListHeader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [cafeList, setCafeList] = useState([
-    {
-      id: '0',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'VARIOUS_DESSERTS', count: 13, isSelected: false },
-        { id: 'SMOKING', count: 9, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-        { id: 'QUIET', count: 21, isSelected: false },
-        { id: 'TWENTY_FOUR', count: 7, isSelected: false },
-        { id: 'PARKING_LOT', count: 6, isSelected: false },
-        { id: 'CLEAN_TOILET', count: 16, isSelected: false },
-        { id: 'STUDY_ROOM', count: 5, isSelected: false },
-      ],
-      badges: ['EDITOR PICK', 'PARTNER'],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-    {
-      id: '1',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-      ],
-      badges: [],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-    {
-      id: '2',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-      ],
-      badges: [],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-    {
-      id: '3',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-      ],
-      badges: ['EDITOR PICK', 'PARTNER'],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-    {
-      id: '4',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-      ],
-      badges: [],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-    {
-      id: '5',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-      ],
-      badges: [],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-    {
-      id: '6',
-      title: '캐틀앤비',
-      distance: '3.5km',
-      address: '서울 서대문구 신촌동 190-21',
-      tags: [
-        { id: 'FLUFFY_CHAIR', count: 24, isSelected: false },
-        { id: 'FAST_WIFI', count: 13, isSelected: false },
-        { id: 'MANY_SEATS', count: 11, isSelected: false },
-        { id: 'TIME_LIMIT', count: 19, isSelected: false },
-        { id: 'CONCENT', count: 8, isSelected: false },
-      ],
-      badges: [],
-      favoriteCount: 10,
-      commentCount: 19,
-    },
-  ]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [cafeList, setCafeList] = useState([]);
 
   const handleToggleSelectingFilter = () => {
     setIsSelectingFilter((prevState) => !prevState);
@@ -177,6 +64,34 @@ const Main = ({ navigation }) => {
     },
     [navigation],
   );
+
+  const getCafeList = useCallback(
+    async (page = 1) => {
+      if (latitude && longitude) {
+        try {
+          await fetchCafeList(latitude, longitude, page);
+          setCurrentPage((prevState) => prevState + 1);
+        } catch (error) {
+          // TODO: 에러 핸들링 필요
+          // TODO: fetchCafeList와 try catch 문이 불필요하게 두번 사용되는 상황 변경 필요
+          console.warn(error);
+        }
+      }
+    },
+    [latitude, longitude, fetchCafeList],
+  );
+
+  useEffect(() => {
+    requestPermissions();
+  }, []);
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, [getCurrentLocation]);
+
+  useEffect(() => {
+    getCafeList();
+  }, [getCafeList]);
 
   return (
     <>
@@ -225,7 +140,7 @@ const Main = ({ navigation }) => {
           </SearchInput>
           {showScrolledListHeader && (
             <ScrolledListHeader>
-              <ScrolledListHeader.Text>망원동에서 제일 가까운 곳</ScrolledListHeader.Text>
+              <ScrolledListHeader.Text>현위치에서 제일 가까운 곳</ScrolledListHeader.Text>
             </ScrolledListHeader>
           )}
         </View>
@@ -233,24 +148,43 @@ const Main = ({ navigation }) => {
         <FlatList
           contentContainerStyle={css`
             margin: 0 16px;
+            padding-bottom: 24px;
           `}
           onScroll={handleScroll}
           onRefresh={handleRefresh}
           refreshing={refreshing}
-          data={cafeList}
+          data={toJS(fetchedCafeList)}
           keyExtractor={(item) => item.id}
           ItemSeparatorComponent={() => <ListSeparator />}
-          renderItem={({ item }) => <CafeListItem data={item} onCardLinkClick={handleCardLinkClick} />}
+          renderItem={({ item }) => {
+            const { id, name, dist, road_addr, tags } = item;
+            const distance = `${Math.floor(dist.calculated)}m`;
+
+            const cafe = {
+              id: id,
+              title: name,
+              distance,
+              address: road_addr,
+              tags,
+            };
+
+            return <CafeListItem data={cafe} onCardLinkClick={handleCardLinkClick} />;
+          }}
           ListHeaderComponent={() => (
             <>
               <HeaderText>
-                망원동에서{'\n'}
+                현위치에서{'\n'}
                 가장 {nowFilter} 곳
               </HeaderText>
               <AutoFitImage source={dummyIllustURL} />
             </>
           )}
+          onEndReached={() => getCafeList(currentPage)}
+          onEndReachedThreshold={0.9}
         />
+
+        {/* TODO: 임시 메시지. 추후 별도의 spinner 필요 */}
+        {isFetching && <Text>카페 리스트를 불러오고 있습니다.</Text>}
       </Container>
     </>
   );

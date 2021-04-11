@@ -26,22 +26,22 @@ const SetTags = ({ preferTags, onToggleTag, allTags }) => {
 SetTags.defaultProps = {
   allTags: [
     [
-      { id: 'FLUFFY_CHAIR', count: 0, isSelected: false },
-      { id: 'FAST_WIFI', count: 0, isSelected: false },
-      { id: 'MANY_SEATS', count: 0, isSelected: false },
-      { id: 'TIME_LIMIT', count: 0, isSelected: false },
+      { id: 'chair', count: 0, isSelected: false },
+      { id: 'wifi', count: 0, isSelected: false },
+      { id: 'seat', count: 0, isSelected: false },
+      { id: 'timer', count: 0, isSelected: false },
     ],
     [
-      { id: 'CONCENT', count: 0, isSelected: false },
-      { id: 'QUIET', count: 0, isSelected: false },
-      { id: 'TWENTY_FOUR', count: 0, isSelected: false },
-      { id: 'PARKING_LOT', count: 0, isSelected: false },
+      { id: 'concent', count: 0, isSelected: false },
+      { id: 'mute', count: 0, isSelected: false },
+      { id: 'twentyFour', count: 0, isSelected: false },
+      { id: 'parking', count: 0, isSelected: false },
     ],
     [
-      { id: 'CLEAN_TOILET', count: 0, isSelected: false },
-      { id: 'STUDY_ROOM', count: 0, isSelected: false },
-      { id: 'VARIOUS_DESSERTS', count: 0, isSelected: false },
-      { id: 'SMOKING', count: 0, isSelected: false },
+      { id: 'toilet', count: 0, isSelected: false },
+      { id: 'study', count: 0, isSelected: false },
+      { id: 'dessert', count: 0, isSelected: false },
+      { id: 'smoking', count: 0, isSelected: false },
     ],
   ],
 };
