@@ -8,6 +8,7 @@ import { HeaderText, Container, ModalView, Footer, FooterBtn } from './Signup.st
 import SetProfile from '~/components/SetProfile/SetProfile';
 import SetTags from '~/components/SetTags/SetTags';
 import InputText from '~/components/InputText/InputText';
+import useSelectedTags from '../../hooks/useSelectedTags';
 
 const Signup = ({ route }) => {
   const { token, name, profileImageUrl } = route.params;
@@ -18,12 +19,13 @@ const Signup = ({ route }) => {
   const [visibleInput, setVisibleInput] = useState(false);
   const [nickname, setNickname] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [preferTags, setPreferTags] = useState([]);
+  const { selectedTags, toggleTag } = useSelectedTags([]);
   const inputRef = useRef(null);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
+        // TODO: API 연동
         setProfileImage(profileImageUrl);
         setNickname(name);
       } catch (err) {
@@ -33,14 +35,21 @@ const Signup = ({ route }) => {
     getUserData();
   }, [name, profileImageUrl]);
 
-  const handlePrevBtn = () => {
-    visibleForm === 'setTags' && setVisibleForm('setProfile');
+  const handlePrevButtonClick = () => {
+    switch (visibleForm) {
+      case 'setTags':
+        setVisibleForm('setProfile');
+        break;
+    }
   };
 
-  const handleNextBtn = () => {
-    visibleForm === 'setProfile' && setVisibleForm('setTags');
-    if (visibleForm === 'setTags') {
-      login(token);
+  const handleNextButtonClick = () => {
+    switch (visibleForm) {
+      case 'setProfile':
+        setVisibleForm('setTags');
+        break;
+      case 'setTags':
+        login(token);
     }
   };
 
@@ -66,27 +75,14 @@ const Signup = ({ route }) => {
     );
   }, []);
 
-  const handleSetNicknameModal = useCallback(async () => {
-    await setVisibleInput(true);
-  }, []);
+  const handleSetNicknameModal = () => {
+    setVisibleInput(true);
+  };
 
-  const handleSetNickname = useCallback(async (text) => {
-    await setNickname(text);
-    await setVisibleInput(false);
-  }, []);
-
-  const handleToggleTag = useCallback((tag) => {
-    setPreferTags((prevSelectedTagIds) => {
-      const ids = [...prevSelectedTagIds];
-      const index = ids.findIndex((id) => tag.id === id);
-      if (index > -1) {
-        ids.splice(index, 1);
-      } else {
-        ids.push(tag.id);
-      }
-      return ids;
-    });
-  }, []);
+  const handleSetNickname = (text) => {
+    setNickname(text);
+    setVisibleInput(false);
+  };
 
   return (
     <>
@@ -96,11 +92,11 @@ const Signup = ({ route }) => {
         </HeaderText>
         <ModalView>
           {visibleForm === 'setProfile' && <SetProfile nickname={nickname} profileImage={profileImage} onSetProfileImage={handleSetProfileImage} onSetNicknameModal={handleSetNicknameModal} />}
-          {visibleForm === 'setTags' && <SetTags preferTags={preferTags} onToggleTag={handleToggleTag} />}
+          {visibleForm === 'setTags' && <SetTags preferTags={selectedTags} onToggleTag={toggleTag} />}
         </ModalView>
         <Footer>
           {visibleForm === 'setTags' ? (
-            <FooterBtn onPress={handlePrevBtn}>
+            <FooterBtn onPress={handlePrevButtonClick}>
               <FooterBtn.Prev>이전</FooterBtn.Prev>
             </FooterBtn>
           ) : (
@@ -111,9 +107,9 @@ const Signup = ({ route }) => {
               </FooterBtn.Text>
             </FooterBtn>
           )}
-          <FooterBtn style={{ backgroundColor: visibleForm === 'setProfile' ? '#ffbb44' : isEmpty(preferTags) ? '#fff' : '#ffbb44' }} onPress={handleNextBtn}>
-            <FooterBtn.Next style={{ color: visibleForm === 'setProfile' ? '#fff' : isEmpty(preferTags) ? '#222' : '#fff' }}>
-              {visibleForm === 'setProfile' ? '다음' : isEmpty(preferTags) ? '건너뛰기' : '완료'}
+          <FooterBtn style={{ backgroundColor: visibleForm === 'setProfile' ? '#ffbb44' : isEmpty(selectedTags) ? '#fff' : '#ffbb44' }} onPress={handleNextButtonClick}>
+            <FooterBtn.Next style={{ color: visibleForm === 'setProfile' ? '#fff' : isEmpty(selectedTags) ? '#222' : '#fff' }}>
+              {visibleForm === 'setProfile' ? '다음' : isEmpty(selectedTags) ? '건너뛰기' : '완료'}
             </FooterBtn.Next>
           </FooterBtn>
         </Footer>
