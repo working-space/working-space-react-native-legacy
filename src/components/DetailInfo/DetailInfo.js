@@ -49,8 +49,8 @@ const DetailInfo = (props) => {
 };
 
 DetailInfo.defaultProps = {
-  address: '서울 서초구 매헌고 1길 30',
-  hours: ['월~금 07:30 ~ 21:00', '토,일 10:00 ~ 18:00'],
+  address: null,
+  hours: null,
   closed: null,
   phone: null,
 };

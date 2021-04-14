@@ -82,9 +82,6 @@ const ImageGrid = (props) => {
 };
 
 ImageGrid.defaultProps = {
-  title: 'Cafe',
-  distance: '2.2km',
-  tags: ['1', '2', '3', '4'],
   cardImages: [
     'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
     'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',

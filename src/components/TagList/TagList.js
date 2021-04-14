@@ -1,4 +1,6 @@
 import React, { useCallback } from 'react';
+import { Text } from 'react-native';
+import { isEmpty } from 'lodash';
 import { TagListWrapper, TagListBox } from './TagList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -18,17 +20,21 @@ const TagList = (props) => {
           <TagListBox.Left>
             <TagListBox.Title>태그</TagListBox.Title>
             <SmallPersonFillIcon />
-            <TagListBox.Count>{tags.length}</TagListBox.Count>
+            <TagListBox.Count>{isEmpty(tags) ? 0 : tags.length}</TagListBox.Count>
           </TagListBox.Left>
           <TouchableOpacity onPress={handleSetTagsModal}>
             <TagListBox.Button>평가하기</TagListBox.Button>
           </TouchableOpacity>
         </TagListBox.Header>
-        <TagListBox.AllTags horizontal={true} showsHorizontalScrollIndicator={true}>
-          {tags.map((tag, i) => {
-            return <TagItem key={i} showCount={true} tag={tag} selected={preferTags.includes(tag.id)} paddingValue={9} />;
-          })}
-        </TagListBox.AllTags>
+        {isEmpty(tags) ? (
+          <Text>태그가 없습니다.</Text>
+        ) : (
+          <TagListBox.AllTags horizontal={true} showsHorizontalScrollIndicator={true}>
+            {tags.map((tag, i) => {
+              return <TagItem key={i} showCount={true} tag={tag} selected={preferTags.includes(tag.id)} paddingValue={9} />;
+            })}
+          </TagListBox.AllTags>
+        )}
       </TagListBox>
     </TagListWrapper>
   );
