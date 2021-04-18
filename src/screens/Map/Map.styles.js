@@ -1,4 +1,10 @@
-import styled from '@emotion/native';
+import styled, { css } from '@emotion/native';
+import { Button as FloatingActionButton } from '~/components/FloatingActionButton/FloatingActionButton.styles';
+
+const AbsoluteRight = css`
+  position: absolute;
+  right: 0;
+`;
 
 export const Container = styled.View`
   flex: 1;
@@ -30,8 +36,31 @@ export const BottomView = styled.View`
   bottom: 0;
 `;
 
+BottomView.Row = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  min-height: 84px;
+`;
+
+BottomView.RowItem = styled.View`
+  justify-content: center;
+  margin: 16px;
+
+  ${({ align }) => align === 'right' && AbsoluteRight};
+`;
+
 export const Card = styled.View`
   width: 100%;
   background-color: #ffffff;
   z-index: 99;
+`;
+
+export const MapButton = styled(FloatingActionButton)`
+  justify-content: center;
+`;
+
+MapButton.Text = styled.Text`
+  padding: 4px 24px;
+  font-size: 12px;
 `;
