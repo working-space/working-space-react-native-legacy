@@ -1,24 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { ScrollView } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { css } from '@emotion/native';
-import useStore from '~/hooks/useStore';
 import Header from '~/components/Header/Header';
-import {
-  Container,
-  SearchInput,
-  ResultContainer,
-  ResultList,
-  SearchGuide,
-  TabContainer,
-  Tab,
-} from './Search.styles';
-import FILTER from '~/constants/filter';
-import MenuIcon from '~/assets/icons/icon_menu.svg';
+import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
+import { Container, SearchInput, ResultList, SearchGuide, TabContainer, Tab } from './Search.styles';
 import MapIcon from '~/assets/icons/icon_map.svg';
 
 const Search = ({ navigation }) => {
-  const { AuthStore } = useStore();
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchType, setSearchType] = useState('location');
 
@@ -30,8 +18,8 @@ const Search = ({ navigation }) => {
     <>
       <Header
         left={
-          <Header.Button onPress={navigation.openDrawer}>
-            <MenuIcon />
+          <Header.Button onPress={() => navigation.navigate('ProfileMenu')}>
+            <ProfileIcon />
           </Header.Button>
         }
         right={
@@ -79,9 +67,7 @@ const Search = ({ navigation }) => {
                 검색하고 싶은 장소, 지하철 역 등 {'\n'}
                 지역에 대한 정보를 입력해주세요.
               </SearchGuide.Text>
-              <SearchGuide.Text small>
-                예) 마포구 서교동, 합정역, 합정
-              </SearchGuide.Text>
+              <SearchGuide.Text small>예) 마포구 서교동, 합정역, 합정</SearchGuide.Text>
             </SearchGuide>
           )}
         </ResultList>

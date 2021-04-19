@@ -6,13 +6,13 @@ import { observer } from 'mobx-react-lite';
 
 import { requestPermissions } from '~/utils/permission';
 import useStore from '~/hooks/useStore';
+import { Container, SearchInput, HeaderText, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
 import Header from '~/components/Header/Header';
 import AutoFitImage from '~/components/AutoFitImage/AutoFitImage';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
-import { Container, SearchInput, HeaderText, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
+import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
 import FILTER from '~/constants/filter';
 import dummyIllustURL from '~/assets/images/dummy_illust.jpg';
-import MenuIcon from '~/assets/icons/icon_menu.svg';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
 
@@ -31,7 +31,6 @@ const Main = ({ navigation }) => {
   const [showScrolledListHeader, setShowScrolledListHeader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [cafeList, setCafeList] = useState([]);
 
   const handleToggleSelectingFilter = () => {
     setIsSelectingFilter((prevState) => !prevState);
@@ -97,8 +96,8 @@ const Main = ({ navigation }) => {
     <>
       <Header
         left={
-          <Header.Button onPress={navigation.openDrawer}>
-            <MenuIcon />
+          <Header.Button onPress={() => navigation.navigate('ProfileMenu')}>
+            <ProfileIcon />
           </Header.Button>
         }
         right={

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import Header from '~/components/Header/Header';
-import { Container, Profile, FavoriteTags, Tag, Menu } from './DrawerMenu.styles';
+import { Container, Profile, FavoriteTags, Tag, Menu } from './ProfileMenu.styles';
 import TAG from '~/constants/tag';
 import CloseIcon from '~/assets/icons/icon_close.svg';
 import SettingIcon from '~/assets/icons/icon_setting.svg';
@@ -10,12 +10,12 @@ import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 
 const favoriteTags = [TAG.concent, TAG.twentyFour, TAG.toilet, TAG.dessert];
 
-const DrawerMenu = ({ navigation }) => {
+const ProfileMenu = ({ navigation }) => {
   return (
     <>
       <Header
         left={
-          <Header.Button onPress={navigation.closeDrawer}>
+          <Header.Button onPress={() => navigation.goBack()}>
             <CloseIcon style={{ fill: '#222' }} />
           </Header.Button>
         }
@@ -79,4 +79,4 @@ const DrawerMenu = ({ navigation }) => {
   );
 };
 
-export default DrawerMenu;
+export default ProfileMenu;
