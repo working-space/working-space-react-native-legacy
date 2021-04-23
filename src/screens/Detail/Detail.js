@@ -26,10 +26,11 @@ import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
 import useSelectedTags from '../../hooks/useSelectedTags';
 
-const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } }) => {
+const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
-  const { DetailCafeDataStore } = useStore();
+  const { DetailCafeDataStore, GeoLocationStore } = useStore();
   const { fetchDetailCafeData, isFetching, fetchedDetailCafeData } = DetailCafeDataStore;
+  const { latitude, longitude } = GeoLocationStore;
 
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferedTags, setPreferedTags] = useState([...userPreferTags]);
@@ -45,11 +46,11 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
 
   const getDetailCafeData = useCallback(async () => {
     try {
-      await fetchDetailCafeData(cafeId);
+      await fetchDetailCafeData(cafeId, latitude, longitude);
     } catch (error) {
       console.warn(error);
     }
-  }, [cafeId, fetchDetailCafeData]);
+  }, [cafeId, latitude, longitude, fetchDetailCafeData]);
 
   const handleToggleFavoriteButton = useCallback(() => {
     setToggleFavorite((prev) => !prev);
@@ -129,8 +130,8 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
         }
       />
       <DetailWrapper>
-        <DetailTitle title={toJS(fetchedDetailCafeData.name)} distance={distance} tags={toJS(fetchedDetailCafeData.tags)} />
-        <ImageGrid title={toJS(fetchedDetailCafeData.name)} distance={distance} tags={toJS(fetchedDetailCafeData.tags)} />
+        <DetailTitle title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
+        <ImageGrid title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
         <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
         <DetailLocation />
         <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferedTags} onSetTagsModal={handleSetTagsModal} />
@@ -175,7 +176,6 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
 };
 
 Detail.defaultProps = {
-  distance: '2.2km',
   like: 23,
   userPreferTags: ['concent', 'dessert'],
 };

@@ -14,15 +14,16 @@ class DetailCafeDataStore {
     return this.status === API_STATUS.PENDING;
   }
 
-  fetchDetailCafeData = flow(function* (cafeId) {
+  fetchDetailCafeData = flow(function* (cafeId, latitude, longitude) {
     if (this.isFetching) return;
 
     this.status = API_STATUS.PENDING;
 
     try {
-      const response = yield api.get(`/cafes/${cafeId}`);
+      const response = yield api.get(`/cafes/${cafeId}/?lat=${latitude}&lon=${longitude}`);
       const newDetailCafeData = response.data;
       this.fetchedDetailCafeData = newDetailCafeData;
+      console.log(this.fetchedDetailCafeData);
       this.status = API_STATUS.SUCCESS;
     } catch (error) {
       this.status = API_STATUS.FAILURE;
