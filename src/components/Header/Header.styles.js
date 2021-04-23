@@ -14,15 +14,20 @@ Container.Top = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  height: 56px;
 `;
 
 Container.Bottom = styled.View``;
 
 export const IconButton = styled.TouchableOpacity`
-  padding: 16px;
+  padding: 0 16px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const RightSide = styled.View`
   flex-direction: row;
   align-items: center;
+  height: 100%;
 `;

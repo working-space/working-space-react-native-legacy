@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import Main from '~/screens/Main/Main';
+import ProfileMenu from '~/screens/ProfileMenu/ProfileMenu';
 import Map from '~/screens/Map/Map';
 import Search from '~/screens/Search/Search';
 import Favorites from '~/screens/UserMenu/Favorites/Favorites';
@@ -25,6 +26,13 @@ const MainNavigator = () => {
       <Stack.Screen
         name="Main"
         component={Main}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ProfileMenu"
+        component={ProfileMenu}
         options={{
           headerShown: false,
         }}

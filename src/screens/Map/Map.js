@@ -11,7 +11,7 @@ import FloatingActionButton from '~/components/FloatingActionButton/FloatingActi
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import MapMarker from '~/components/MapMarker/MapMarker';
 import SelectModal from '~/components/SelectModal/SelectModal';
-import MenuIcon from '~/assets/icons/icon_menu.svg';
+import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
 import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
 import MapPickerImage from '~/assets/icons/icon_mappicker.png';
@@ -149,8 +149,8 @@ const Map = ({ navigation }) => {
     <>
       <Header
         left={
-          <Header.Button onPress={navigation.openDrawer}>
-            <MenuIcon />
+          <Header.Button onPress={() => navigation.navigate('ProfileMenu')}>
+            <ProfileIcon />
           </Header.Button>
         }
         right={
