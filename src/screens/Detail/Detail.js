@@ -26,19 +26,16 @@ import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
 import useSelectedTags from '../../hooks/useSelectedTags';
 
-const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
+const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
   const { DetailCafeDataStore, GeoLocationStore } = useStore();
-  const { fetchDetailCafeData, isFetching, fetchedDetailCafeData } = DetailCafeDataStore;
+  const { fetchDetailCafeData, isFetching, fetchedDetailCafeData, userPreferredTags, cafeLikeCountData, userToggleLike, userToggleBookmark } = DetailCafeDataStore;
   const { latitude, longitude } = GeoLocationStore;
 
   const [visibleInput, setVisibleInput] = useState(null);
-  const [preferedTags, setPreferedTags] = useState([...userPreferTags]);
-  const [toggleFavorite, setToggleFavorite] = useState(false);
-  const [toggleBookmark, setToggleBookmark] = useState(false);
-  const [comment, setComment] = useState(null);
+  const [preferredTags, setpreferredTags] = useState(userPreferredTags);
   const inputRef = useRef(null);
-  const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags([...userPreferTags]);
+  const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTags);
 
   useEffect(() => {
     getDetailCafeData();
@@ -46,18 +43,18 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 
   const getDetailCafeData = useCallback(async () => {
     try {
-      await fetchDetailCafeData(cafeId, latitude, longitude);
+      await fetchDetailCafeData(cafeId, userId, latitude, longitude);
     } catch (error) {
       console.warn(error);
     }
-  }, [cafeId, latitude, longitude, fetchDetailCafeData]);
+  }, [cafeId, userId, latitude, longitude, fetchDetailCafeData]);
 
-  const handleToggleFavoriteButton = useCallback(() => {
-    setToggleFavorite((prev) => !prev);
+  const handleToggleLikeButton = useCallback(() => {
+    console.log('Change Like');
   }, []);
 
   const handleToggleBookmarkButton = useCallback(() => {
-    setToggleBookmark((prev) => !prev);
+    console.log('Change Bookmark');
   }, []);
 
   const handleShareButton = async () => {
@@ -85,7 +82,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
   }, []);
 
   const handleSetCommentText = useCallback(async (text) => {
-    await setComment(text);
+    await console.log(text);
     await setVisibleInput(null);
   }, []);
 
@@ -95,12 +92,12 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 
   const handleSubmitBtn = () => {
     setVisibleInput(null);
-    setPreferedTags([...selectedTags]);
+    setpreferredTags([...selectedTags]);
   };
 
   const handleCloseBtn = () => {
     setVisibleInput(null);
-    setSelectedTags([...preferedTags]);
+    setSelectedTags([...preferredTags]);
   };
 
   if (fetchedDetailCafeData === null || isFetching) {
@@ -118,11 +115,13 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
         }
         right={
           <LinkIconWrapper>
-            <LinkIconWrapper.Item onPress={handleToggleFavoriteButton}>
-              {toggleFavorite ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
-              <LinkIconWrapper.Text>{like + toggleFavorite}</LinkIconWrapper.Text>
+            <LinkIconWrapper.Item onPress={handleToggleLikeButton}>
+              {userToggleLike.count ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
+              <LinkIconWrapper.Text>{toJS(cafeLikeCountData)}</LinkIconWrapper.Text>
             </LinkIconWrapper.Item>
-            <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>{toggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}</LinkIconWrapper.Item>
+            <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>
+              {userToggleBookmark.count ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}
+            </LinkIconWrapper.Item>
             <LinkIconWrapper.Item onPress={handleShareButton}>
               <ShareIcon width="24" height="24" />
             </LinkIconWrapper.Item>
@@ -134,7 +133,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
         <ImageGrid title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
         <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
         <DetailLocation />
-        <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferedTags} onSetTagsModal={handleSetTagsModal} />
+        <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
         <CommentList comments={toJS(fetchedDetailCafeData.comments)} onSetCommentTextModal={handleSetCommentTextModal} />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
@@ -153,10 +152,10 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
           <ModalEvaluation.SubmitButton
             onPress={handleSubmitBtn}
             style={css`
-              background-color: ${isEmpty(preferedTags) && isEmpty(selectedTags) ? '#cccccc' : '#ffbb44'};
+              background-color: ${isEmpty(preferredTags) && isEmpty(selectedTags) ? '#cccccc' : '#ffbb44'};
             `}>
             <ModalEvaluation.Text>
-              {isEmpty(preferedTags) && isEmpty(selectedTags) ? '태그가 선택되지 않았어요.' : `태그 ${selectedTags ? selectedTags.length : preferedTags.length}개 선택! 평가 등록하기`}
+              {isEmpty(preferredTags) && isEmpty(selectedTags) ? '태그가 선택되지 않았어요.' : `태그 ${selectedTags ? selectedTags.length : preferredTags.length}개 선택! 평가 등록하기`}
             </ModalEvaluation.Text>
           </ModalEvaluation.SubmitButton>
         </ModalEvaluation>
@@ -176,8 +175,7 @@ const Detail = ({ like, userPreferTags, route, navigation: { goBack } }) => {
 };
 
 Detail.defaultProps = {
-  like: 23,
-  userPreferTags: ['concent', 'dessert'],
+  userId: 'jiwon',
 };
 
 export default observer(Detail);

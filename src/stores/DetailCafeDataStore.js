@@ -4,7 +4,13 @@ import API_STATUS from '../constants/apiStatus';
 
 class DetailCafeDataStore {
   status = API_STATUS.INIT;
+
   fetchedDetailCafeData = null;
+  cafeLikeCountData = null;
+
+  userPreferredTags = null;
+  userToggleLike = null;
+  userToggleBookmark = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -14,16 +20,24 @@ class DetailCafeDataStore {
     return this.status === API_STATUS.PENDING;
   }
 
-  fetchDetailCafeData = flow(function* (cafeId, latitude, longitude) {
+  fetchDetailCafeData = flow(function* (cafeId, userId, latitude, longitude) {
     if (this.isFetching) return;
 
     this.status = API_STATUS.PENDING;
 
     try {
-      const response = yield api.get(`/cafes/${cafeId}/?lat=${latitude}&lon=${longitude}`);
-      const newDetailCafeData = response.data;
-      this.fetchedDetailCafeData = newDetailCafeData;
-      console.log(this.fetchedDetailCafeData);
+      const responseDetailCafeData = yield api.get(`/cafes/${cafeId}/?lat=${latitude}&lon=${longitude}`);
+      this.fetchedDetailCafeData = responseDetailCafeData.data;
+      const responseCafeLikeData = yield api.get(`/ratings/?cafe_id=${cafeId}`);
+      this.cafeLikeCountData = responseCafeLikeData.data.count;
+
+      const responseUserPreferredTags = yield api.get(`/tags/?id=${cafeId}&name=${userId}`);
+      this.userPreferredTags = responseUserPreferredTags.data.results;
+      const responseUserToggleLike = yield api.get(`/ratings/?cafe_id=${cafeId}&user_id=${userId}`);
+      this.userToggleLike = responseUserToggleLike.data;
+      const responseUserToggleBookmark = yield api.get(`/bookmarks/?user_id=${userId}`);
+      this.userToggleBookmark = responseUserToggleBookmark.data;
+
       this.status = API_STATUS.SUCCESS;
     } catch (error) {
       this.status = API_STATUS.FAILURE;
