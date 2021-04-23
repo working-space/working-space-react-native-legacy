@@ -7,6 +7,7 @@ import { ImageWrapper, CardImage, TotalView, CloseButton, InfoBox } from './Imag
 import CloseIcon from '~/assets/icons/icon_close.svg';
 import SmallLocationFillIcon from '~/assets/icons/icon_small_location_fill.svg';
 import SmallTagFillIcon from '~/assets/icons/icon_small_tag_fill.svg';
+import NoneImage from '../NoneImage/NoneImage';
 
 const ImageGrid = (props) => {
   const { title, distance, tags, cardImages } = props;
@@ -25,6 +26,14 @@ const ImageGrid = (props) => {
       </TotalView>
     );
   };
+
+  if (cardImages === null) {
+    return (
+      <ImageWrapper>
+        <NoneImage />
+      </ImageWrapper>
+    );
+  }
 
   return (
     <>
@@ -82,14 +91,15 @@ const ImageGrid = (props) => {
 };
 
 ImageGrid.defaultProps = {
-  cardImages: [
-    'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
-    'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
-    'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
-    'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
-    'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
-    'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
-  ],
+  // cardImages: [
+  //   'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
+  //   'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
+  //   'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
+  //   'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
+  //   'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
+  //   'https://cdn.inflearn.com/wp-content/uploads/web3-1.png',
+  // ],
+  cardImages: null,
 };
 
 export default ImageGrid;
