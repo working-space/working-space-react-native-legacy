@@ -3,7 +3,10 @@ import { Share, Text } from 'react-native';
 import Modal from 'react-native-modal';
 import { css } from '@emotion/native';
 import { isEmpty } from 'lodash';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import useStore from '~hooks/useStore';
+
 import { DetailWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
 import Header from '~/components/Header/Header';
 import DetailTitle from '~/components/DetailInfo/DetailTitle';
@@ -21,14 +24,13 @@ import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
-import api from '~/api';
 import useSelectedTags from '../../hooks/useSelectedTags';
 
 const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
+  const { DetailCafeDataStore } = useStore();
+  const { fetchDetailCafeData, isFetching, fetchedDetailCafeData } = DetailCafeDataStore;
 
-  const [cafeData, setCafeData] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferedTags, setPreferedTags] = useState([...userPreferTags]);
   const [toggleFavorite, setToggleFavorite] = useState(false);
@@ -37,24 +39,17 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
   const inputRef = useRef(null);
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags([...userPreferTags]);
 
-  const getCafeDetail = async (id) => {
+  useEffect(() => {
+    getDetailCafeData();
+  }, [getDetailCafeData]);
+
+  const getDetailCafeData = useCallback(async () => {
     try {
-      const result = await api.get(`/cafes/${id}/`);
-      return result.data;
+      await fetchDetailCafeData(cafeId);
     } catch (error) {
       console.warn(error);
     }
-  };
-
-  useEffect(() => {
-    cafeData === null && setLoading(true);
-    getCafeDetail(cafeId)
-      .then((cafe) => {
-        loading && setCafeData(cafe);
-        setLoading(false);
-      })
-      .catch((error) => console.log(error));
-  }, [cafeData, loading, cafeId]);
+  }, [cafeId, fetchDetailCafeData]);
 
   const handleToggleFavoriteButton = useCallback(() => {
     setToggleFavorite((prev) => !prev);
@@ -67,7 +62,7 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
   const handleShareButton = async () => {
     try {
       const result = await Share.share({
-        title: cafeData.name,
+        title: toJS(fetchedDetailCafeData.name),
         message: '작업하기 좋은 카페를 추천합니다!',
       });
       if (result.action === Share.shareAction) {
@@ -107,7 +102,7 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
     setSelectedTags([...preferedTags]);
   };
 
-  if (cafeData === null || loading) {
+  if (fetchedDetailCafeData === null || isFetching) {
     return <Text>로딩중</Text>;
   }
 
@@ -134,12 +129,12 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
         }
       />
       <DetailWrapper>
-        <DetailTitle title={cafeData.name} distance={distance} tags={cafeData.tags} />
-        <ImageGrid title={cafeData.name} distance={distance} tags={cafeData.tags} />
-        <DetailInfo address={cafeData.parcel_addr} phone={cafeData.phone} />
+        <DetailTitle title={toJS(fetchedDetailCafeData.name)} distance={distance} tags={toJS(fetchedDetailCafeData.tags)} />
+        <ImageGrid title={toJS(fetchedDetailCafeData.name)} distance={distance} tags={toJS(fetchedDetailCafeData.tags)} />
+        <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
         <DetailLocation />
-        <TagList tags={cafeData.tags} preferTags={preferedTags} onSetTagsModal={handleSetTagsModal} />
-        <CommentList comments={cafeData.comments} onSetCommentTextModal={handleSetCommentTextModal} />
+        <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferedTags} onSetTagsModal={handleSetTagsModal} />
+        <CommentList comments={toJS(fetchedDetailCafeData.comments)} onSetCommentTextModal={handleSetCommentTextModal} />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
         <ModalEvaluation>
