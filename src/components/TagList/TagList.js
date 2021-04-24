@@ -34,7 +34,7 @@ const TagList = (props) => {
         ) : (
           <TagListBox.AllTags horizontal={true} showsHorizontalScrollIndicator={true}>
             {tags.map((tag, i) => {
-              return <TagItem key={i} showCount={true} tag={tag} selected={preferTags.includes(tag.id)} paddingValue={9} />;
+              return <TagItem key={i} showCount={true} tag={tag} selected={isEmpty(preferTags) ? false : preferTags.includes(tag.id)} paddingValue={9} />;
             })}
           </TagListBox.AllTags>
         )}
@@ -58,7 +58,6 @@ TagList.defaultProps = {
     { id: 'dessert', count: 13, isSelected: false },
     { id: 'smoking', count: 9, isSelected: false },
   ],
-  preferTags: ['CLEAN_TOILET', 'STUDY_ROOM', 'VARIOUS_DESSERTS', 'SMOKING'],
 };
 
 export default TagList;

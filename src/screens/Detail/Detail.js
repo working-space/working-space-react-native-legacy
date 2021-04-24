@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Share, Text } from 'react-native';
+import { Share } from 'react-native';
 import Modal from 'react-native-modal';
 import { css } from '@emotion/native';
 import { isEmpty } from 'lodash';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import useStore from '~hooks/useStore';
+
 import { DetailWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
 import Header from '~/components/Header/Header';
 import DetailTitle from '~/components/DetailInfo/DetailTitle';
@@ -22,53 +25,68 @@ import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
-import api from '~/api';
 import useSelectedTags from '../../hooks/useSelectedTags';
 
-const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } }) => {
+const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
+  const { DetailCafeDataStore, GeoLocationStore } = useStore();
+  const {
+    fetchDetailCafeData,
+    isFetching,
+    fetchedDetailCafeData,
+    fetchCommentsList,
+    fetchedCommentsList,
+    userPreferredTags,
+    cafeLikeCountData,
+    userToggleLike,
+    userToggleBookmark,
+    userComments,
+  } = DetailCafeDataStore;
+  const { latitude, longitude } = GeoLocationStore;
 
-  const [cafeData, setCafeData] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [visibleInput, setVisibleInput] = useState(null);
-  const [preferedTags, setPreferedTags] = useState([...userPreferTags]);
-  const [toggleFavorite, setToggleFavorite] = useState(false);
-  const [toggleBookmark, setToggleBookmark] = useState(false);
-  const [comment, setComment] = useState(null);
+  const [preferredTags, setpreferredTags] = useState(userPreferredTags);
+  const [currentPage, setCurrentPage] = useState(0);
   const inputRef = useRef(null);
-  const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags([...userPreferTags]);
+  const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTags);
 
-  const getCafeDetail = async (id) => {
+  useEffect(() => {
+    getDetailCafeData();
+  }, [getDetailCafeData]);
+
+  const getDetailCafeData = useCallback(
+    async (page = 0) => {
+      try {
+        await fetchDetailCafeData(cafeId, userId, latitude, longitude, page);
+        setCurrentPage((prev) => prev + 1);
+      } catch (error) {
+        console.warn(error);
+      }
+    },
+    [cafeId, userId, latitude, longitude, fetchDetailCafeData],
+  );
+
+  const getCommentsList = useCallback(async () => {
     try {
-      const result = await api.get(`/cafes/${id}/`);
-      return result.data;
+      await fetchCommentsList(cafeId, currentPage);
+      setCurrentPage((prev) => prev + 1);
     } catch (error) {
       console.warn(error);
     }
-  };
+  }, [cafeId, currentPage, fetchCommentsList]);
 
-  useEffect(() => {
-    cafeData === null && setLoading(true);
-    getCafeDetail(cafeId)
-      .then((cafe) => {
-        loading && setCafeData(cafe);
-        setLoading(false);
-      })
-      .catch((error) => console.log(error));
-  }, [cafeData, loading, cafeId]);
-
-  const handleToggleFavoriteButton = useCallback(() => {
-    setToggleFavorite((prev) => !prev);
+  const handleToggleLikeButton = useCallback(() => {
+    console.log('Change Like');
   }, []);
 
   const handleToggleBookmarkButton = useCallback(() => {
-    setToggleBookmark((prev) => !prev);
+    console.log('Change Bookmark');
   }, []);
 
   const handleShareButton = async () => {
     try {
       const result = await Share.share({
-        title: cafeData.name,
+        title: toJS(fetchedDetailCafeData.name),
         message: '작업하기 좋은 카페를 추천합니다!',
       });
       if (result.action === Share.shareAction) {
@@ -90,7 +108,7 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
   }, []);
 
   const handleSetCommentText = useCallback(async (text) => {
-    await setComment(text);
+    await console.log(text);
     await setVisibleInput(null);
   }, []);
 
@@ -100,15 +118,15 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
 
   const handleSubmitBtn = () => {
     setVisibleInput(null);
-    setPreferedTags([...selectedTags]);
+    setpreferredTags([...selectedTags]);
   };
 
   const handleCloseBtn = () => {
     setVisibleInput(null);
-    setSelectedTags([...preferedTags]);
+    setSelectedTags([...preferredTags]);
   };
 
-  if (cafeData === null || loading) {
+  if (fetchedDetailCafeData === null || isFetching) {
     return <LoadingBar />;
   }
 
@@ -123,11 +141,13 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
         }
         right={
           <LinkIconWrapper>
-            <LinkIconWrapper.Item onPress={handleToggleFavoriteButton}>
-              {toggleFavorite ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
-              <LinkIconWrapper.Text>{like + toggleFavorite}</LinkIconWrapper.Text>
+            <LinkIconWrapper.Item onPress={handleToggleLikeButton}>
+              {userToggleLike ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
+              <LinkIconWrapper.Text>{toJS(cafeLikeCountData)}</LinkIconWrapper.Text>
             </LinkIconWrapper.Item>
-            <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>{toggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}</LinkIconWrapper.Item>
+            <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>
+              {userToggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}
+            </LinkIconWrapper.Item>
             <LinkIconWrapper.Item onPress={handleShareButton}>
               <ShareIcon width="24" height="24" />
             </LinkIconWrapper.Item>
@@ -135,12 +155,17 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
         }
       />
       <DetailWrapper>
-        <DetailTitle title={cafeData.name} distance={distance} tags={cafeData.tags} />
-        <ImageGrid title={cafeData.name} distance={distance} tags={cafeData.tags} />
-        <DetailInfo address={cafeData.parcel_addr} phone={cafeData.phone} />
+        <DetailTitle title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
+        <ImageGrid title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
+        <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
         <DetailLocation />
-        <TagList tags={cafeData.tags} preferTags={preferedTags} onSetTagsModal={handleSetTagsModal} />
-        <CommentList comments={cafeData.comments} onSetCommentTextModal={handleSetCommentTextModal} />
+        <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
+        <CommentList
+          comments={toJS(fetchedCommentsList)}
+          userComments={toJS(userComments)}
+          onSetCommentTextModal={handleSetCommentTextModal}
+          onMoreCommentsButtonClick={() => getCommentsList(currentPage)}
+        />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
         <ModalEvaluation>
@@ -158,10 +183,10 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
           <ModalEvaluation.SubmitButton
             onPress={handleSubmitBtn}
             style={css`
-              background-color: ${isEmpty(preferedTags) && isEmpty(selectedTags) ? '#cccccc' : '#ffbb44'};
+              background-color: ${isEmpty(preferredTags) && isEmpty(selectedTags) ? '#cccccc' : '#ffbb44'};
             `}>
             <ModalEvaluation.Text>
-              {isEmpty(preferedTags) && isEmpty(selectedTags) ? '태그가 선택되지 않았어요.' : `태그 ${selectedTags ? selectedTags.length : preferedTags.length}개 선택! 평가 등록하기`}
+              {isEmpty(preferredTags) && isEmpty(selectedTags) ? '태그가 선택되지 않았어요.' : `태그 ${selectedTags ? selectedTags.length : preferredTags.length}개 선택! 평가 등록하기`}
             </ModalEvaluation.Text>
           </ModalEvaluation.SubmitButton>
         </ModalEvaluation>
@@ -181,9 +206,7 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
 };
 
 Detail.defaultProps = {
-  distance: '2.2km',
-  like: 23,
-  userPreferTags: ['concent', 'dessert'],
+  userId: 'jiwon',
 };
 
 export default observer(Detail);
