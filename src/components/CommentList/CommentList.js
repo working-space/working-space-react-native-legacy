@@ -1,14 +1,15 @@
 import React, { useCallback } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import useStore from '~hooks/useStore';
 import { isEmpty } from 'lodash';
 import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage, CommentText, NoneItem } from './CommentList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
 import DropdownIcon from '~/assets/icons/icon_dropdown.svg';
 import NoneImage from '~/assets/images/none-image.svg';
+import OptionIcon from '~/assets/icons/icon-option.svg';
 
 const CommentList = (props) => {
-  const { comments, onSetCommentTextModal, onMoreCommentsButtonClick } = props;
+  const { comments, userComments, onSetCommentTextModal, onMoreCommentsButtonClick } = props;
   const { DetailCafeDataStore } = useStore();
   const { hasNextComments } = DetailCafeDataStore;
 
@@ -56,9 +57,16 @@ const CommentList = (props) => {
                           <CommentItemTitle.Name>{comment.user_id}</CommentItemTitle.Name>
                           <CommentItemTitle.Date>{comment.update_dt}</CommentItemTitle.Date>
                         </CommentItemTitle.left>
-                        <TouchableOpacity>
-                          <Text>...</Text>
-                        </TouchableOpacity>
+                        {userComments !== null &&
+                          userComments.map((userComment) => {
+                            return (
+                              comment.id === userComment.id && (
+                                <TouchableOpacity key={userComment.id}>
+                                  <OptionIcon />
+                                </TouchableOpacity>
+                              )
+                            );
+                          })}
                       </CommentItemTitle>
                       <CommentItem.Text>{comment.content}</CommentItem.Text>
                     </CommentItem.Info>

@@ -7,12 +7,13 @@ class DetailCafeDataStore {
 
   fetchedDetailCafeData = null;
   cafeLikeCountData = null;
-  fetchedCommentsList = [];
+  fetchedCommentsList = null;
   hasNextComments = null;
 
   userPreferredTags = null;
   userToggleLike = null;
   userToggleBookmark = null;
+  userComments = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -26,7 +27,7 @@ class DetailCafeDataStore {
     return this.status === API_STATUS.LOADING;
   }
 
-  fetchDetailCafeData = flow(function* (cafeId, userId, latitude, longitude) {
+  fetchDetailCafeData = flow(function* (cafeId, userId, latitude, longitude, page) {
     if (this.isFetching) return;
 
     this.status = API_STATUS.PENDING;
@@ -36,13 +37,16 @@ class DetailCafeDataStore {
       this.fetchedDetailCafeData = responseDetailCafeData.data;
       const responseCafeLikeData = yield api.get(`/ratings/?cafe_id=${cafeId}`);
       this.cafeLikeCountData = responseCafeLikeData.data.count;
+      this.fetchCommentsList(cafeId, page);
 
       const responseUserPreferredTags = yield api.get(`/tags/?id=${cafeId}&name=${userId}`);
       this.userPreferredTags = responseUserPreferredTags.data.results;
       const responseUserToggleLike = yield api.get(`/ratings/?cafe_id=${cafeId}&user_id=${userId}`);
-      this.userToggleLike = responseUserToggleLike.data;
+      this.userToggleLike = responseUserToggleLike.data.count;
       const responseUserToggleBookmark = yield api.get(`/bookmarks/?user_id=${userId}`);
-      this.userToggleBookmark = responseUserToggleBookmark.data;
+      this.userToggleBookmark = responseUserToggleBookmark.data.count;
+      const responseUserComments = yield api.get(`/comments/?cafe_id=${cafeId}&user_id=${userId}`);
+      this.userComments = responseUserComments.data.results;
 
       this.status = API_STATUS.SUCCESS;
     } catch (error) {
@@ -51,7 +55,7 @@ class DetailCafeDataStore {
     }
   }).bind(this);
 
-  fetchCommentsList = flow(function* (cafeId, userId, page) {
+  fetchCommentsList = flow(function* (cafeId, page) {
     if (this.isLoading) return;
 
     this.status = API_STATUS.LOADING;
@@ -66,6 +70,7 @@ class DetailCafeDataStore {
 
       this.hasNextComments = response.data.next;
       this.fetchedCommentsList = [...this.fetchedCommentsList, ...newCommentsList];
+
       this.status = API_STATUS.SUCCESS;
     } catch (error) {
       this.status = API_STATUS.FAILURE;

@@ -40,6 +40,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     cafeLikeCountData,
     userToggleLike,
     userToggleBookmark,
+    userComments,
   } = DetailCafeDataStore;
   const { latitude, longitude } = GeoLocationStore;
 
@@ -56,23 +57,23 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   const getDetailCafeData = useCallback(
     async (page = 0) => {
       try {
-        await fetchDetailCafeData(cafeId, userId, latitude, longitude);
-        await getCommentsList(cafeId, userId, page);
+        await fetchDetailCafeData(cafeId, userId, latitude, longitude, page);
+        setCurrentPage((prev) => prev + 1);
       } catch (error) {
         console.warn(error);
       }
     },
-    [cafeId, userId, latitude, longitude, fetchDetailCafeData, getCommentsList],
+    [cafeId, userId, latitude, longitude, fetchDetailCafeData],
   );
 
   const getCommentsList = useCallback(async () => {
     try {
-      await fetchCommentsList(cafeId, userId, currentPage);
+      await fetchCommentsList(cafeId, currentPage);
       setCurrentPage((prev) => prev + 1);
     } catch (error) {
       console.warn(error);
     }
-  }, [cafeId, userId, currentPage, fetchCommentsList]);
+  }, [cafeId, currentPage, fetchCommentsList]);
 
   const handleToggleLikeButton = useCallback(() => {
     console.log('Change Like');
@@ -125,7 +126,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     setSelectedTags([...preferredTags]);
   };
 
-  if (fetchedDetailCafeData === null || isEmpty(fetchedCommentsList) || isFetching) {
+  if (fetchedDetailCafeData === null || isFetching) {
     return <LoadingBar />;
   }
 
@@ -141,11 +142,11 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         right={
           <LinkIconWrapper>
             <LinkIconWrapper.Item onPress={handleToggleLikeButton}>
-              {userToggleLike.count ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
+              {userToggleLike ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
               <LinkIconWrapper.Text>{toJS(cafeLikeCountData)}</LinkIconWrapper.Text>
             </LinkIconWrapper.Item>
             <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>
-              {userToggleBookmark.count ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}
+              {userToggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}
             </LinkIconWrapper.Item>
             <LinkIconWrapper.Item onPress={handleShareButton}>
               <ShareIcon width="24" height="24" />
@@ -159,7 +160,12 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
         <DetailLocation />
         <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
-        <CommentList comments={toJS(fetchedCommentsList)} onSetCommentTextModal={handleSetCommentTextModal} onMoreCommentsButtonClick={() => getCommentsList(currentPage)} />
+        <CommentList
+          comments={toJS(fetchedCommentsList)}
+          userComments={toJS(userComments)}
+          onSetCommentTextModal={handleSetCommentTextModal}
+          onMoreCommentsButtonClick={() => getCommentsList(currentPage)}
+        />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
         <ModalEvaluation>
