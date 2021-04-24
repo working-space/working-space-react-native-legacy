@@ -16,7 +16,8 @@ import TagList from '~/components/TagList/TagList';
 import CommentList from '~/components/CommentList/CommentList';
 import ImageGrid from '~/components/ImageGrid/ImageGrid';
 import SetTags from '~/components/SetTags/SetTags';
-import InputComment from '~/components/InputComment/InputComment';
+import InputText from '~/components/InputText/InputText';
+import LoadingBar from '~/components/LoadingBar/LoadingBar';
 import BackIcon from '~/assets/icons/icon_back.svg';
 import ShareIcon from '~/assets/icons/icon_share.svg';
 import FavoriteIcon from '~/assets/icons/icon_favorite.svg';
@@ -101,7 +102,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   };
 
   if (fetchedDetailCafeData === null || isFetching) {
-    return <Text>로딩중</Text>;
+    return <LoadingBar />;
   }
 
   return (
@@ -162,13 +163,13 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
       </Modal>
       <Modal
         style={{ width: '100%', margin: 0 }}
-        backdropOpacity={0}
+        backdropOpacity={0.3}
         isVisible={visibleInput === 'Comments'}
         onBackButtonPress={handleCloseBtn}
         hideModalContentWhileAnimating={true}
         useNativeDriver={true}
         onModalShow={() => inputRef.current.focus()}>
-        <InputComment onSetCommentText={handleSetCommentText} inputRef={inputRef} />
+        <InputText usage="comment" onSetInputText={handleSetCommentText} inputRef={inputRef} />
       </Modal>
     </>
   );
