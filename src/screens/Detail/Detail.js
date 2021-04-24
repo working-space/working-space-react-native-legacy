@@ -14,6 +14,7 @@ import CommentList from '~/components/CommentList/CommentList';
 import ImageGrid from '~/components/ImageGrid/ImageGrid';
 import SetTags from '~/components/SetTags/SetTags';
 import InputText from '~/components/InputText/InputText';
+import LoadingBar from '~/components/LoadingBar/LoadingBar';
 import BackIcon from '~/assets/icons/icon_back.svg';
 import ShareIcon from '~/assets/icons/icon_share.svg';
 import FavoriteIcon from '~/assets/icons/icon_favorite.svg';
@@ -108,7 +109,7 @@ const Detail = ({ distance, like, userPreferTags, route, navigation: { goBack } 
   };
 
   if (cafeData === null || loading) {
-    return <Text>로딩중</Text>;
+    return <LoadingBar />;
   }
 
   return (
