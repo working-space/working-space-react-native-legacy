@@ -24,7 +24,7 @@ const Main = ({ navigation }) => {
   const { AuthStore, CafeListStore, GeoLocationStore } = useStore();
   const { logout } = AuthStore;
   const { fetchCafeList, isFetching, fetchedCafeList } = CafeListStore;
-  const { latitude, longitude, getCurrentLocation } = GeoLocationStore;
+  const { currentLocation, getCurrentLocation } = GeoLocationStore;
 
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
@@ -66,6 +66,7 @@ const Main = ({ navigation }) => {
 
   const getCafeList = useCallback(
     async (page = 1) => {
+      const { latitude, longitude } = currentLocation;
       if (latitude && longitude) {
         try {
           await fetchCafeList(latitude, longitude, page);
@@ -77,14 +78,11 @@ const Main = ({ navigation }) => {
         }
       }
     },
-    [latitude, longitude, fetchCafeList],
+    [currentLocation, fetchCafeList],
   );
 
   useEffect(() => {
     requestPermissions();
-  }, []);
-
-  useEffect(() => {
     getCurrentLocation();
   }, [getCurrentLocation]);
 

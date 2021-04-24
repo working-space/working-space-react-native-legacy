@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { css } from '@emotion/native';
 import { observer } from 'mobx-react-lite';
-import Geolocation from 'react-native-geolocation-service';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
+import useStore from '~/hooks/useStore';
 import api from '~/api';
-import { Container, SearchInput, Card, BottomView } from './Map.styles';
+import { requestPermissions } from '~/utils/permission';
+import { Container, SearchInput, Card, BottomView, MapButton } from './Map.styles';
 import Header from '~/components/Header/Header';
-import FloatingActionButton from '~/components/FloatingActionButton/FloatingActionButton';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import MapMarker from '~/components/MapMarker/MapMarker';
 import SelectModal from '~/components/SelectModal/SelectModal';
@@ -18,7 +18,10 @@ import MapPickerImage from '~/assets/icons/icon_mappicker.png';
 import MapPickerSelectImage from '~/assets/icons/icon_mappicker_select.png';
 
 const Map = ({ navigation }) => {
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const { GeoLocationStore } = useStore();
+  const { currentLocation, getCurrentLocation } = GeoLocationStore;
+
+  const [currentRegion, setCurrentRegion] = useState({});
   const [cafes, setCafes] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState({});
@@ -27,10 +30,10 @@ const Map = ({ navigation }) => {
   const mapRef = useRef();
 
   const initializeMapScreen = () => {
-    setCurrentLocation(null);
     setCafes([]);
     setMarkers([]);
     setSelectedMarker({});
+    setCurrentRegion({});
   };
 
   const selectMarker = (locationKey, currentCafe) => {
@@ -53,14 +56,6 @@ const Map = ({ navigation }) => {
 
     mapRef.current.animateCamera({ center: { latitude: latitude - 0.0007, longitude } });
   };
-
-  const handleSubmitSelectModal = useCallback(
-    (cafe) => {
-      setSelectModalVisible(false);
-      selectMarker(selectingStatus.locationKey, cafe);
-    },
-    [selectingStatus],
-  );
 
   const toggleModal = () => {
     setSelectModalVisible((prevState) => !prevState);
@@ -87,10 +82,30 @@ const Map = ({ navigation }) => {
     setMarkers(newMarkers);
   }, [cafes]);
 
-  const handlePressMarker = (locationKey, currentCafes) => {
+  const fetchCafes = useCallback(async (latitude, longitude) => {
+    const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&page=1`);
+    setCafes(response.data.results);
+  }, []);
+
+  const handleRegionChange = (region) => {
+    if (!cafes || cafes.length <= 0) return;
+
+    setCurrentRegion(region);
+  };
+
+  const handleSubmitSelectModal = useCallback(
+    (cafe) => {
+      setSelectModalVisible(false);
+      selectMarker(selectingStatus.locationKey, cafe);
+    },
+    [selectingStatus],
+  );
+
+  const handleSelectMarker = (locationKey, currentCafes) => {
     if (currentCafes.length > 1) {
       setSelectModalVisible(true);
       setSelectingStatus({ cafes: currentCafes, locationKey });
+
       return;
     }
 
@@ -104,42 +119,33 @@ const Map = ({ navigation }) => {
     [navigation],
   );
 
-  const handleGetLocation = useCallback(() => {
+  const handleSearchCurrentPosition = useCallback(() => {
+    const { latitude, longitude } = currentRegion;
+
+    if (!(latitude && longitude)) return;
+
     initializeMapScreen();
+    fetchCafes(latitude, longitude);
+  }, [currentRegion, fetchCafes]);
 
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setCurrentLocation({
-          latitude,
-          longitude,
-        });
-        mapRef.current.setCamera({ center: { latitude, longitude } });
-      },
-      (error) => {
-        console.log(error.code, error.message);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-    );
-  }, []);
+  const handleGetCurrentLocation = useCallback(() => {
+    initializeMapScreen();
+    getCurrentLocation();
+  }, [getCurrentLocation]);
 
-  const fetchCafes = useCallback(async () => {
-    if (!currentLocation) {
-      return;
-    }
+  useEffect(() => {
+    requestPermissions();
+    handleGetCurrentLocation();
+  }, [handleGetCurrentLocation]);
 
+  useEffect(() => {
     const { latitude, longitude } = currentLocation;
-    const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&page=1`);
-    setCafes(response.data.results);
-  }, [currentLocation]);
 
-  useEffect(() => {
-    handleGetLocation();
-  }, [handleGetLocation]);
+    if (!(latitude && longitude)) return;
 
-  useEffect(() => {
-    fetchCafes();
-  }, [fetchCafes]);
+    mapRef.current.setCamera({ center: { latitude, longitude } });
+    fetchCafes(latitude, longitude);
+  }, [currentLocation, fetchCafes]);
 
   useEffect(() => {
     getMarkers();
@@ -181,7 +187,8 @@ const Map = ({ navigation }) => {
             latitudeDelta: 0.009,
             longitudeDelta: 0.009,
           }}
-          onPress={() => setSelectedMarker({})}>
+          onPress={() => setSelectedMarker({})}
+          onRegionChangeComplete={handleRegionChange}>
           {markers &&
             Object.entries(markers).map((currentMarker) => {
               const [locationKey, currentCafes] = currentMarker;
@@ -193,7 +200,7 @@ const Map = ({ navigation }) => {
                   key={locationKey}
                   coordinate={{ latitude, longitude }}
                   image={selectedMarker.locationKey === locationKey ? MapPickerSelectImage : MapPickerImage}
-                  onPress={() => handlePressMarker(locationKey, cafe)}
+                  onPress={() => handleSelectMarker(locationKey, cafe)}
                   tracksViewChanges={true}
                   stopPropagation={true}
                 />
@@ -201,9 +208,20 @@ const Map = ({ navigation }) => {
             })}
         </MapView>
         <BottomView>
-          <FloatingActionButton onPress={handleGetLocation}>
-            <LocateActiveIcon />
-          </FloatingActionButton>
+          <BottomView.Row>
+            {currentRegion.latitude && currentRegion.longitude && (
+              <BottomView.RowItem>
+                <MapButton onPress={handleSearchCurrentPosition}>
+                  <MapButton.Text>현재 위치에서 검색하기</MapButton.Text>
+                </MapButton>
+              </BottomView.RowItem>
+            )}
+            <BottomView.RowItem align="right">
+              <MapButton onPress={handleGetCurrentLocation}>
+                <LocateActiveIcon />
+              </MapButton>
+            </BottomView.RowItem>
+          </BottomView.Row>
           {selectedMarker.cafe && (
             <Card>
               <CafeListItem noBorder={true} data={selectedMarker.cafe} onCardLinkClick={() => handlePressCafeListItem(selectedMarker.cafe)} />

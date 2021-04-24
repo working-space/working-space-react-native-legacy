@@ -5,21 +5,24 @@ import API_STATUS from '../constants/apiStatus';
 class GeoLocationStore {
   constructor() {
     makeObservable(this, {
-      latitude: observable,
-      longitude: observable,
+      currentLocation: observable,
       status: observable,
       setCoordinates: action,
       getCurrentLocation: action,
     });
   }
 
-  latitude = null;
-  longitude = null;
+  currentLocation = {
+    latitude: null,
+    longitude: null,
+  };
   status = API_STATUS.IDLE;
 
   setCoordinates = (latitude, longitude) => {
-    this.latitude = latitude;
-    this.longitude = longitude;
+    this.currentLocation = {
+      latitude,
+      longitude,
+    };
   };
 
   getCurrentLocation = () => {
