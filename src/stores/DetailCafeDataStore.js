@@ -7,6 +7,8 @@ class DetailCafeDataStore {
 
   fetchedDetailCafeData = null;
   cafeLikeCountData = null;
+  fetchedCommentsList = [];
+  hasNextComments = null;
 
   userPreferredTags = null;
   userToggleLike = null;
@@ -18,6 +20,10 @@ class DetailCafeDataStore {
 
   get isFetching() {
     return this.status === API_STATUS.PENDING;
+  }
+
+  get isLoading() {
+    return this.status === API_STATUS.LOADING;
   }
 
   fetchDetailCafeData = flow(function* (cafeId, userId, latitude, longitude) {
@@ -42,6 +48,27 @@ class DetailCafeDataStore {
     } catch (error) {
       this.status = API_STATUS.FAILURE;
       console.log(error);
+    }
+  }).bind(this);
+
+  fetchCommentsList = flow(function* (cafeId, userId, page) {
+    if (this.isLoading) return;
+
+    this.status = API_STATUS.LOADING;
+
+    if (page <= 0) {
+      this.fetchedCommentsList = [];
+    }
+
+    try {
+      const response = yield api.get(`/comments/?cafe_id=${cafeId}&offset=${page}&limit=5`);
+      const newCommentsList = response.data.results;
+
+      this.hasNextComments = response.data.next;
+      this.fetchedCommentsList = [...this.fetchedCommentsList, ...newCommentsList];
+      this.status = API_STATUS.SUCCESS;
+    } catch (error) {
+      this.status = API_STATUS.FAILURE;
     }
   }).bind(this);
 }

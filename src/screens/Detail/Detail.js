@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Share, Text } from 'react-native';
+import { Share } from 'react-native';
 import Modal from 'react-native-modal';
 import { css } from '@emotion/native';
 import { isEmpty } from 'lodash';
@@ -30,11 +30,22 @@ import useSelectedTags from '../../hooks/useSelectedTags';
 const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
   const { DetailCafeDataStore, GeoLocationStore } = useStore();
-  const { fetchDetailCafeData, isFetching, fetchedDetailCafeData, userPreferredTags, cafeLikeCountData, userToggleLike, userToggleBookmark } = DetailCafeDataStore;
+  const {
+    fetchDetailCafeData,
+    isFetching,
+    fetchedDetailCafeData,
+    fetchCommentsList,
+    fetchedCommentsList,
+    userPreferredTags,
+    cafeLikeCountData,
+    userToggleLike,
+    userToggleBookmark,
+  } = DetailCafeDataStore;
   const { latitude, longitude } = GeoLocationStore;
 
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferredTags, setpreferredTags] = useState(userPreferredTags);
+  const [currentPage, setCurrentPage] = useState(0);
   const inputRef = useRef(null);
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTags);
 
@@ -42,13 +53,26 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     getDetailCafeData();
   }, [getDetailCafeData]);
 
-  const getDetailCafeData = useCallback(async () => {
+  const getDetailCafeData = useCallback(
+    async (page = 0) => {
+      try {
+        await fetchDetailCafeData(cafeId, userId, latitude, longitude);
+        await getCommentsList(cafeId, userId, page);
+      } catch (error) {
+        console.warn(error);
+      }
+    },
+    [cafeId, userId, latitude, longitude, fetchDetailCafeData, getCommentsList],
+  );
+
+  const getCommentsList = useCallback(async () => {
     try {
-      await fetchDetailCafeData(cafeId, userId, latitude, longitude);
+      await fetchCommentsList(cafeId, userId, currentPage);
+      setCurrentPage((prev) => prev + 1);
     } catch (error) {
       console.warn(error);
     }
-  }, [cafeId, userId, latitude, longitude, fetchDetailCafeData]);
+  }, [cafeId, userId, currentPage, fetchCommentsList]);
 
   const handleToggleLikeButton = useCallback(() => {
     console.log('Change Like');
@@ -101,7 +125,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     setSelectedTags([...preferredTags]);
   };
 
-  if (fetchedDetailCafeData === null || isFetching) {
+  if (fetchedDetailCafeData === null || isEmpty(fetchedCommentsList) || isFetching) {
     return <LoadingBar />;
   }
 
@@ -135,7 +159,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
         <DetailLocation />
         <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
-        <CommentList comments={toJS(fetchedDetailCafeData.comments)} onSetCommentTextModal={handleSetCommentTextModal} />
+        <CommentList comments={toJS(fetchedCommentsList)} onSetCommentTextModal={handleSetCommentTextModal} onMoreCommentsButtonClick={() => getCommentsList(currentPage)} />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
         <ModalEvaluation>

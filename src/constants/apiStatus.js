@@ -3,6 +3,7 @@ const API_STATUS = {
   PENDING: 'pending',
   SUCCESS: 'success',
   FAILURE: 'failure',
+  LOADING: 'loading',
 };
 
 export default API_STATUS;
