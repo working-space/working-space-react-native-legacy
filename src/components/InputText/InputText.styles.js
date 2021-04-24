@@ -14,7 +14,7 @@ export const InputBox = styled.View`
   width: 100%;
   height: 64px;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   background-color: #fff;
   padding: 0 16px;
@@ -24,31 +24,43 @@ InputBox.Info = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding-bottom: 4px;
+  border-width: 1px;
+  border-color: #cccccc;
+  border-style: solid;
+  border-radius: 4px;
 `;
 
 InputBox.Text = styled.TextInput`
-  width: 88%;
-  font-size: 18px;
+  width: 80%;
+  font-size: 12px;
   color: #222;
-  padding: 0;
+  padding: 0 12px;
 `;
 
-InputBox.CancelBtn = styled.TouchableOpacity`
+InputBox.CancelButton = styled.TouchableOpacity`
   width: 20px;
   height: 20px;
-  background-color: #ccc;
   padding: 2px;
-  margin-left: 16px;
+  margin-right: 10px;
+  background-color: #ccc;
   border-radius: 20px;
 `;
 
-InputBox.underline = styled.View`
-  width: 100%;
-  height: 17px;
-  background-color: #fff;
-  padding: 0 16px;
-  border-top-width: 1px;
+InputBox.PhotoButton = styled.TouchableOpacity`
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  margin-right: 10px;
+`;
+
+export const SubmitButton = styled.TouchableOpacity`
+  padding: 8px 12px;
+  border-left-width: 1px;
+  border-color: #cccccc;
   border-style: solid;
-  border-color: #222222;
+`;
+
+SubmitButton.Text = styled.Text`
+  font-size: 12px;
+  color: #cccccc;
 `;

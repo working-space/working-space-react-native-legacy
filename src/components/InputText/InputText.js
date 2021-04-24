@@ -1,14 +1,15 @@
 import React, { useState, useCallback } from 'react';
-import { Container, InputBox } from './InputText.styles';
+import { Container, InputBox, SubmitButton } from './InputText.styles';
 import SmallCloseIcon from '~/assets/icons/icon_small_close.svg';
+import SmallCameraLineIcon from '~/assets/icons/icon_small_camera_line.svg';
 
-const InputText = ({ defaultText, onSetNickname, inputRef }) => {
-  const [nickname, setNickname] = useState(defaultText);
-  const handleSetNickname = useCallback(
+const InputText = ({ usage, defaultText, onSetInputText, inputRef }) => {
+  const [inputText, setInputText] = useState(usage === 'nickname' ? defaultText : '');
+  const handleSetInputText = useCallback(
     (text) => {
-      onSetNickname?.(text);
+      onSetInputText?.(text);
     },
-    [onSetNickname],
+    [onSetInputText],
   );
 
   return (
@@ -16,17 +17,25 @@ const InputText = ({ defaultText, onSetNickname, inputRef }) => {
       <InputBox>
         <InputBox.Info>
           <InputBox.Text
-            placeholder="이름을 입력해주세요"
-            value={nickname}
-            onChangeText={(text) => setNickname(text)}
-            onSubmitEditing={(event) => handleSetNickname(event.nativeEvent.text)}
+            placeholder={usage === 'nickname' ? '이름을 입력해주세요' : '댓글을 입력하세요'}
+            value={inputText}
+            onChangeText={(text) => setInputText(text)}
+            onSubmitEditing={(event) => handleSetInputText(event.nativeEvent.text)}
             ref={inputRef}
           />
-          <InputBox.CancelBtn onPress={() => handleSetNickname(defaultText)}>
-            <SmallCloseIcon />
-          </InputBox.CancelBtn>
+          {usage === 'nickname' ? (
+            <InputBox.CancelButton onPress={() => handleSetInputText(defaultText)}>
+              <SmallCloseIcon />
+            </InputBox.CancelButton>
+          ) : (
+            <InputBox.PhotoButton>
+              <SmallCameraLineIcon width="18" height="18" />
+            </InputBox.PhotoButton>
+          )}
+          <SubmitButton onPress={() => handleSetInputText(inputText)}>
+            <SubmitButton.Text>등록</SubmitButton.Text>
+          </SubmitButton>
         </InputBox.Info>
-        <InputBox.underline />
       </InputBox>
     </Container>
   );

@@ -124,3 +124,16 @@ CommentMoreButton.Text = styled.Text`
   color: #a7a7a7;
   padding-left: 4px;
 `;
+
+export const NoneItem = styled.View`
+  flex: 1;
+  align-items: flex-end;
+`;
+
+NoneItem.Text = styled.Text`
+  width: 100%;
+  font-size: 14px;
+  color: #cccccc;
+  text-align: center;
+  margin-top: 12px;
+`;

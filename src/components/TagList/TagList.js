@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import { Text } from 'react-native';
 import { isEmpty } from 'lodash';
-import { TagListWrapper, TagListBox } from './TagList.styles';
+import { TagListWrapper, TagListBox, NoneItem } from './TagList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import TagItem from '~/components/TagItem/TagItem';
+import NoneImage from '~/assets/images/none-image.svg';
 
 const TagList = (props) => {
   const { tags, preferTags, onSetTagsModal } = props;
@@ -27,7 +27,10 @@ const TagList = (props) => {
           </TouchableOpacity>
         </TagListBox.Header>
         {isEmpty(tags) ? (
-          <Text>태그가 없습니다.</Text>
+          <NoneItem>
+            <NoneImage />
+            <NoneItem.Text>첫 태그를 남겨보세요!</NoneItem.Text>
+          </NoneItem>
         ) : (
           <TagListBox.AllTags horizontal={true} showsHorizontalScrollIndicator={true}>
             {tags.map((tag, i) => {

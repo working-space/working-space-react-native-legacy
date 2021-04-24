@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { isEmpty } from 'lodash';
-import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage, CommentText } from './CommentList.styles';
+import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage, CommentText, NoneItem } from './CommentList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
 import DropdownIcon from '~/assets/icons/icon_dropdown.svg';
+import NoneImage from '~/assets/images/none-image.svg';
 
 const CommentList = (props) => {
   const { comments, onSetCommentTextModal } = props;
@@ -29,7 +30,10 @@ const CommentList = (props) => {
           </CommentText>
         </CommentListBox.Input>
         {isEmpty(comments) ? (
-          <Text>댓글이 없습니다.</Text>
+          <NoneItem>
+            <NoneImage />
+            <NoneItem.Text>첫 댓글을 작성해보세요!</NoneItem.Text>
+          </NoneItem>
         ) : (
           <>
             <CommentListBox.View>

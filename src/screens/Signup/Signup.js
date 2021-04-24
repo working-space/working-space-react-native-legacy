@@ -116,12 +116,13 @@ const Signup = ({ route }) => {
       </Container>
       <Modal
         style={{ width: '100%', margin: 0 }}
+        backdropOpacity={0.3}
         isVisible={visibleInput}
         onBackButtonPress={() => setVisibleInput(false)}
         hideModalContentWhileAnimating={true}
         useNativeDriver={true}
         onModalShow={() => inputRef.current.focus()}>
-        <InputText defaultText={nickname} onSetNickname={handleSetNickname} inputRef={inputRef} />
+        <InputText usage="nickname" defaultText={nickname} onSetInputText={handleSetNickname} inputRef={inputRef} />
       </Modal>
     </>
   );
