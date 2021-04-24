@@ -47,3 +47,16 @@ TagListBox.AllTags = styled.ScrollView`
   flex-direction: row;
   margin: 0 9px;
 `;
+
+export const NoneItem = styled.View`
+  flex: 1;
+  align-items: flex-end;
+`;
+
+NoneItem.Text = styled.Text`
+  width: 100%;
+  font-size: 14px;
+  color: #cccccc;
+  text-align: center;
+  margin-top: 12px;
+`;
