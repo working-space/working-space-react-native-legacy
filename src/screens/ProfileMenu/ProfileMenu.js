@@ -1,12 +1,13 @@
 import React, { Fragment } from 'react';
 import Header from '~/components/Header/Header';
-import { Container, Profile, FavoriteTags, Tag, Menu } from './ProfileMenu.styles';
+import { Container, FavoriteTags, Tag, Menu, Line } from './ProfileMenu.styles';
 import TAG from '~/constants/tag';
-import CloseIcon from '~/assets/icons/icon_close.svg';
+import BackIcon from '~/assets/icons/icon_back.svg';
 import SettingIcon from '~/assets/icons/icon_setting.svg';
 import FavoriteFillIcon from '~/assets/icons/icon_favorite_fill.svg';
 import CommentMenuIcon from '~/assets/icons/icon_comment_menu.svg';
 import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
+import SetProfile from '../../components/SetProfile/SetProfile';
 
 const favoriteTags = [TAG.concent, TAG.twentyFour, TAG.toilet, TAG.dessert];
 
@@ -16,21 +17,12 @@ const ProfileMenu = ({ navigation }) => {
       <Header
         left={
           <Header.Button onPress={() => navigation.goBack()}>
-            <CloseIcon style={{ fill: '#222' }} />
-          </Header.Button>
-        }
-        right={
-          <Header.Button>
-            <SettingIcon />
+            <BackIcon style={{ fill: '#222' }} />
           </Header.Button>
         }
       />
       <Container>
-        <Profile>
-          <Profile.Image />
-          <Profile.Title>평범한 작업자</Profile.Title>
-          <Profile.Name>김작업</Profile.Name>
-        </Profile>
+        <SetProfile nickname="김작업" profileImage={null} showBadge={true} />
         <FavoriteTags>
           <FavoriteTags.Header>
             <FavoriteTags.Title>나의 선호 태그</FavoriteTags.Title>
@@ -72,6 +64,13 @@ const ProfileMenu = ({ navigation }) => {
               <BookmarkIcon />
             </Menu.Icon>
             <Menu.Text>즐겨찾기</Menu.Text>
+          </Menu.Item>
+          <Line />
+          <Menu.Item>
+            <Menu.Icon>
+              <SettingIcon />
+            </Menu.Icon>
+            <Menu.Text>앱 설정</Menu.Text>
           </Menu.Item>
         </Menu>
       </Container>

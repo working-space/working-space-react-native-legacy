@@ -61,3 +61,10 @@ EditName.Icon = styled.View`
   width: 16px;
   height: 16px;
 `;
+
+export const BadgeName = styled.Text`
+  font-size: 14px;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  color: #000;
+`;

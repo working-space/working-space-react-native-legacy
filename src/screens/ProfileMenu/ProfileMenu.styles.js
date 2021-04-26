@@ -3,37 +3,13 @@ import styled from '@emotion/native';
 export const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
-  margin-top: 56px;
   padding: 0 16px;
   z-index: 1;
 `;
 
-export const Profile = styled.View`
-  padding: 16px 0;
-  align-items: center;
-`;
-
-Profile.Image = styled.Image`
-  width: 100px;
-  height: 100px;
-  border-radius: 50px;
-  background-color: #cccccc;
-  margin-bottom: 24px;
-`;
-
-Profile.Title = styled.Text`
-  font-size: 14px;
-  line-height: 20px;
-  margin-bottom: 4px;
-`;
-
-Profile.Name = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-`;
-
 export const FavoriteTags = styled.View`
   padding: 24px 0;
+  margin-top: 40px;
 `;
 
 FavoriteTags.Header = styled.View`
@@ -109,4 +85,14 @@ Menu.Icon = styled.View`
 
 Menu.Text = styled.Text`
   font-size: 14px;
+`;
+
+export const Line = styled.View`
+  width: 100%;
+  height: 0;
+  border-top-width: 1px;
+  border-style: solid;
+  border-color: #f0f0f0;
+  margin-top: 16px;
+  margin-bottom: 16px;
 `;
