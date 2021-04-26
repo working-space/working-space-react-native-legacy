@@ -1,5 +1,8 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useCallback, useRef } from 'react';
+import * as ImagePicker from 'react-native-image-picker';
+import Modal from 'react-native-modal';
 import Header from '~/components/Header/Header';
+import InputText from '~/components/InputText/InputText';
 import { Container, FavoriteTags, Tag, Menu, Line } from './ProfileMenu.styles';
 import TAG from '~/constants/tag';
 import BackIcon from '~/assets/icons/icon_back.svg';
@@ -12,6 +15,42 @@ import SetProfile from '../../components/SetProfile/SetProfile';
 const favoriteTags = [TAG.concent, TAG.twentyFour, TAG.toilet, TAG.dessert];
 
 const ProfileMenu = ({ navigation }) => {
+  const [visibleInput, setVisibleInput] = useState(false);
+  const [nickname, setNickname] = useState('김작업');
+  const [profileImage, setProfileImage] = useState(null);
+  const inputRef = useRef(null);
+
+  const handleSetProfileImage = useCallback(async () => {
+    await ImagePicker.launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        maxHeight: 200,
+        maxWidth: 200,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else {
+          setProfileImage(response.uri);
+        }
+      },
+    );
+  }, []);
+
+  const handleSetNicknameModal = () => {
+    setVisibleInput(true);
+  };
+
+  const handleSetNickname = (text) => {
+    setNickname(text);
+    setVisibleInput(false);
+  };
+
   return (
     <>
       <Header
@@ -22,7 +61,7 @@ const ProfileMenu = ({ navigation }) => {
         }
       />
       <Container>
-        <SetProfile nickname="김작업" profileImage={null} showBadge={true} />
+        <SetProfile nickname={nickname} profileImage={profileImage} showBadge={true} onSetProfileImage={handleSetProfileImage} onSetNicknameModal={handleSetNicknameModal} />
         <FavoriteTags>
           <FavoriteTags.Header>
             <FavoriteTags.Title>나의 선호 태그</FavoriteTags.Title>
@@ -74,6 +113,16 @@ const ProfileMenu = ({ navigation }) => {
           </Menu.Item>
         </Menu>
       </Container>
+      <Modal
+        style={{ width: '100%', margin: 0 }}
+        backdropOpacity={0.3}
+        isVisible={visibleInput}
+        onBackButtonPress={() => setVisibleInput(false)}
+        hideModalContentWhileAnimating={true}
+        useNativeDriver={true}
+        onModalShow={() => inputRef.current.focus()}>
+        <InputText usage="nickname" defaultText={nickname} onSetInputText={handleSetNickname} inputRef={inputRef} />
+      </Modal>
     </>
   );
 };
