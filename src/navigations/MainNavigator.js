@@ -7,6 +7,7 @@ import Search from '~/screens/Search/Search';
 import Favorites from '~/screens/UserMenu/Favorites/Favorites';
 import Comments from '~/screens/UserMenu/Comments/Comments';
 import Bookmarks from '~/screens/UserMenu/Bookmarks/Bookmarks';
+import Settings from '~/screens/UserMenu/Settings/Settings';
 import Detail from '~/screens/Detail/Detail';
 
 const Stack = createStackNavigator();
@@ -73,6 +74,14 @@ const MainNavigator = () => {
       <Stack.Screen
         name="Bookmarks"
         component={Bookmarks}
+        options={{
+          headerShown: false,
+          headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
         options={{
           headerShown: false,
           headerBackTitleVisible: false,

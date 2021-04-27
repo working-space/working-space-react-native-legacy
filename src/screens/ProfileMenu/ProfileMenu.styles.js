@@ -3,37 +3,13 @@ import styled from '@emotion/native';
 export const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
-  margin-top: 56px;
   padding: 0 16px;
   z-index: 1;
 `;
 
-export const Profile = styled.View`
-  padding: 16px 0;
-  align-items: center;
-`;
-
-Profile.Image = styled.Image`
-  width: 100px;
-  height: 100px;
-  border-radius: 50px;
-  background-color: #cccccc;
-  margin-bottom: 24px;
-`;
-
-Profile.Title = styled.Text`
-  font-size: 14px;
-  line-height: 20px;
-  margin-bottom: 4px;
-`;
-
-Profile.Name = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-`;
-
 export const FavoriteTags = styled.View`
   padding: 24px 0;
+  margin-top: 40px;
 `;
 
 FavoriteTags.Header = styled.View`
@@ -47,6 +23,8 @@ FavoriteTags.Title = styled.Text`
   font-size: 14px;
   font-weight: bold;
 `;
+
+FavoriteTags.MenuButton = styled.TouchableOpacity``;
 
 FavoriteTags.Menu = styled.Text`
   font-size: 12px;
@@ -109,4 +87,62 @@ Menu.Icon = styled.View`
 
 Menu.Text = styled.Text`
   font-size: 14px;
+`;
+
+export const Line = styled.View`
+  width: 100%;
+  height: 0;
+  border-top-width: 1px;
+  border-style: solid;
+  border-color: #f0f0f0;
+  margin-top: 16px;
+  margin-bottom: 16px;
+`;
+
+export const ModalEvaluation = styled.View`
+  flex: 1;
+  background-color: #ffffff;
+  justify-content: space-between;
+`;
+
+ModalEvaluation.Header = styled.View`
+  flex-direction: column;
+  justify-content: flex-start;
+`;
+
+ModalEvaluation.Top = styled.View`
+  align-items: flex-end;
+  padding: 16px 0;
+  padding-right: 16px;
+`;
+
+ModalEvaluation.Bottom = styled.View`
+  align-items: flex-start;
+  padding-top: 16px;
+  padding-left: 16px;
+`;
+
+ModalEvaluation.Title = styled.Text`
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: bold;
+  color: #222222;
+`;
+
+ModalEvaluation.CloseButton = styled.TouchableOpacity`
+  justify-content: center;
+  align-items: center;
+`;
+
+ModalEvaluation.SubmitButton = styled.TouchableOpacity`
+  width: 100%;
+  height: 54px;
+  justify-content: center;
+  align-items: center;
+`;
+
+ModalEvaluation.Text = styled.Text`
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
 `;
