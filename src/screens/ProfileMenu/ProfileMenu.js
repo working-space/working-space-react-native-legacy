@@ -105,7 +105,7 @@ const ProfileMenu = ({ navigation }) => {
             <Menu.Text>즐겨찾기</Menu.Text>
           </Menu.Item>
           <Line />
-          <Menu.Item>
+          <Menu.Item onPress={() => navigation.navigate('Settings')}>
             <Menu.Icon>
               <SettingIcon />
             </Menu.Icon>
