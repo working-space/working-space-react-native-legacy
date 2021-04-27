@@ -24,6 +24,8 @@ FavoriteTags.Title = styled.Text`
   font-weight: bold;
 `;
 
+FavoriteTags.MenuButton = styled.TouchableOpacity``;
+
 FavoriteTags.Menu = styled.Text`
   font-size: 12px;
   color: #a7a7a7;
@@ -95,4 +97,52 @@ export const Line = styled.View`
   border-color: #f0f0f0;
   margin-top: 16px;
   margin-bottom: 16px;
+`;
+
+export const ModalEvaluation = styled.View`
+  flex: 1;
+  background-color: #ffffff;
+  justify-content: space-between;
+`;
+
+ModalEvaluation.Header = styled.View`
+  flex-direction: column;
+  justify-content: flex-start;
+`;
+
+ModalEvaluation.Top = styled.View`
+  align-items: flex-end;
+  padding: 16px 0;
+  padding-right: 16px;
+`;
+
+ModalEvaluation.Bottom = styled.View`
+  align-items: flex-start;
+  padding-top: 16px;
+  padding-left: 16px;
+`;
+
+ModalEvaluation.Title = styled.Text`
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: bold;
+  color: #222222;
+`;
+
+ModalEvaluation.CloseButton = styled.TouchableOpacity`
+  justify-content: center;
+  align-items: center;
+`;
+
+ModalEvaluation.SubmitButton = styled.TouchableOpacity`
+  width: 100%;
+  height: 54px;
+  justify-content: center;
+  align-items: center;
+`;
+
+ModalEvaluation.Text = styled.Text`
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
 `;
