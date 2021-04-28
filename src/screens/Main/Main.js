@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FlatList, View, Text } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { FlatList, View, Text, Animated } from 'react-native';
 import { css } from '@emotion/native';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -26,9 +26,10 @@ const Main = ({ navigation }) => {
 
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST.id);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
-  const [showScrolledListHeader, setShowScrolledListHeader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const handleToggleSelectingFilter = () => {
     setIsSelectingFilter((prevState) => !prevState);
@@ -44,16 +45,27 @@ const Main = ({ navigation }) => {
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const handleScroll = useCallback((event) => {
-    const THRESHOLD = 300;
-    // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
-    // TODO: showScrolledListHeader가 변경될 때마다 이미지가 깜빡거리는 문제 수정 필요
-    if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
-      setShowScrolledListHeader(true);
-    } else {
-      setShowScrolledListHeader(false);
-    }
-  }, []);
+  const handleScroll = useCallback(
+    (event) => {
+      const THRESHOLD = 220;
+      // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
+      // TODO: showScrolledListHeader가 변경될 때마다 이미지가 깜빡거리는 문제 수정 필요
+      if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 10,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+    [fadeAnim],
+  );
 
   const handleCardLinkClick = useCallback(
     (cafe) => {
@@ -133,11 +145,11 @@ const Main = ({ navigation }) => {
           <SearchInput onPress={() => navigation.navigate('Search')}>
             <SearchInput.PlaceHolder>현 위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
           </SearchInput>
-          {showScrolledListHeader && (
+          <Animated.View style={{ opacity: fadeAnim, zIndex: 10 }}>
             <ScrolledListHeader>
-              <ScrolledListHeader.Text>현 위치에서 제일 가까운 곳</ScrolledListHeader.Text>
+              <ScrolledListHeader.Text>현 위치에서 가장 {FILTER[nowFilter].name} 곳</ScrolledListHeader.Text>
             </ScrolledListHeader>
-          )}
+          </Animated.View>
         </View>
 
         <FlatList
