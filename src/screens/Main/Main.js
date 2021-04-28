@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FlatList, View, Text } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { FlatList, View, Text, Animated } from 'react-native';
 import { css } from '@emotion/native';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -8,11 +8,9 @@ import { requestPermissions } from '~/utils/permission';
 import useStore from '~/hooks/useStore';
 import { Container, SearchInput, HeaderText, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
 import Header from '~/components/Header/Header';
-import AutoFitImage from '~/components/AutoFitImage/AutoFitImage';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
 import FILTER from '~/constants/filter';
-import dummyIllustURL from '~/assets/images/dummy_illust.jpg';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
 
@@ -26,11 +24,12 @@ const Main = ({ navigation }) => {
   const { fetchCafeList, isFetching, fetchedCafeList } = CafeListStore;
   const { currentLocation, getCurrentLocation } = GeoLocationStore;
 
-  const [nowFilter, setNowFilter] = useState(FILTER.NEAREST);
+  const [nowFilter, setNowFilter] = useState(FILTER.NEAREST.id);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
-  const [showScrolledListHeader, setShowScrolledListHeader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const handleToggleSelectingFilter = () => {
     setIsSelectingFilter((prevState) => !prevState);
@@ -46,16 +45,27 @@ const Main = ({ navigation }) => {
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const handleScroll = useCallback((event) => {
-    const THRESHOLD = 300;
-    // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
-    // TODO: showScrolledListHeader가 변경될 때마다 이미지가 깜빡거리는 문제 수정 필요
-    if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
-      setShowScrolledListHeader(true);
-    } else {
-      setShowScrolledListHeader(false);
-    }
-  }, []);
+  const handleScroll = useCallback(
+    (event) => {
+      const THRESHOLD = 220;
+      // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
+      // TODO: showScrolledListHeader가 변경될 때마다 이미지가 깜빡거리는 문제 수정 필요
+      if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 10,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+    [fadeAnim],
+  );
 
   const handleCardLinkClick = useCallback(
     (cafe) => {
@@ -101,7 +111,7 @@ const Main = ({ navigation }) => {
         right={
           <>
             <FilterChangeButton onPress={handleToggleSelectingFilter}>
-              <FilterChangeButton.Text active={isSelectingFilter}>{nowFilter} 순</FilterChangeButton.Text>
+              <FilterChangeButton.Text active={isSelectingFilter}>{FILTER[nowFilter].name} 순</FilterChangeButton.Text>
               <DropDownArrowIcon />
             </FilterChangeButton>
             <Header.Button onPress={() => navigation.navigate('Map')}>
@@ -112,14 +122,14 @@ const Main = ({ navigation }) => {
         bottom={
           isSelectingFilter && (
             <FilterSelect>
-              <FilterSelect.Item active={nowFilter === FILTER.NEAREST} onPress={() => handleSelectFilter(FILTER.NEAREST)}>
-                <FilterSelect.Text active={nowFilter === FILTER.NEAREST}>{FILTER.NEAREST} 순</FilterSelect.Text>
+              <FilterSelect.Item active={nowFilter === FILTER.NEAREST.id} onPress={() => handleSelectFilter(FILTER.NEAREST.id)}>
+                <FilterSelect.Text active={nowFilter === FILTER.NEAREST.id}>{FILTER.NEAREST.name} 순</FilterSelect.Text>
               </FilterSelect.Item>
-              <FilterSelect.Item active={nowFilter === FILTER.MANY_COMMENTS} onPress={() => handleSelectFilter(FILTER.MANY_COMMENTS)}>
-                <FilterSelect.Text active={nowFilter === FILTER.MANY_COMMENTS}>{FILTER.MANY_COMMENTS} 순</FilterSelect.Text>
+              <FilterSelect.Item active={nowFilter === FILTER.MANY_COMMENTS.id} onPress={() => handleSelectFilter(FILTER.MANY_COMMENTS.id)}>
+                <FilterSelect.Text active={nowFilter === FILTER.MANY_COMMENTS.id}>{FILTER.MANY_COMMENTS.name} 순</FilterSelect.Text>
               </FilterSelect.Item>
-              <FilterSelect.Item active={nowFilter === FILTER.MANY_FAVORITES} onPress={() => handleSelectFilter(FILTER.MANY_FAVORITES)}>
-                <FilterSelect.Text active={nowFilter === FILTER.MANY_FAVORITES}>{FILTER.MANY_FAVORITES} 순</FilterSelect.Text>
+              <FilterSelect.Item active={nowFilter === FILTER.MANY_FAVORITES.id} onPress={() => handleSelectFilter(FILTER.MANY_FAVORITES.id)}>
+                <FilterSelect.Text active={nowFilter === FILTER.MANY_FAVORITES.id}>{FILTER.MANY_FAVORITES.name} 순</FilterSelect.Text>
               </FilterSelect.Item>
             </FilterSelect>
           )
@@ -133,13 +143,13 @@ const Main = ({ navigation }) => {
       <Container>
         <View>
           <SearchInput onPress={() => navigation.navigate('Search')}>
-            <SearchInput.PlaceHolder>현위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
+            <SearchInput.PlaceHolder>현 위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
           </SearchInput>
-          {showScrolledListHeader && (
+          <Animated.View style={{ opacity: fadeAnim, zIndex: 10 }}>
             <ScrolledListHeader>
-              <ScrolledListHeader.Text>현위치에서 제일 가까운 곳</ScrolledListHeader.Text>
+              <ScrolledListHeader.Text>현 위치에서 가장 {FILTER[nowFilter].name} 곳</ScrolledListHeader.Text>
             </ScrolledListHeader>
-          )}
+          </Animated.View>
         </View>
 
         <FlatList
@@ -170,10 +180,10 @@ const Main = ({ navigation }) => {
           ListHeaderComponent={() => (
             <>
               <HeaderText>
-                현위치에서{'\n'}
-                가장 {nowFilter} 곳
+                현 위치에서{'\n'}
+                가장 {FILTER[nowFilter].name} 곳
               </HeaderText>
-              <AutoFitImage source={dummyIllustURL} />
+              {FILTER[nowFilter].imageURL}
             </>
           )}
           onEndReached={() => getCafeList(currentPage)}

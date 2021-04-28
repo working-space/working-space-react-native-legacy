@@ -32,14 +32,13 @@ export const HeaderText = styled.Text`
 
 export const ScrolledListHeader = styled.View`
   position: absolute;
-  top: 64px;
+  top: 0;
   width: 100%;
   padding: 16px 16px 24px 16px;
   border-style: solid;
   border-color: #f0f0f0;
   border-bottom-width: 1px;
   background-color: #ffffff;
-  z-index: 10;
 `;
 
 ScrolledListHeader.Text = styled.Text`
