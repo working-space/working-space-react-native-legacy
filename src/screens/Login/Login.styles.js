@@ -2,7 +2,6 @@ import styled from '@emotion/native';
 
 export const Container = styled.View`
   flex: 1;
-  padding: 16px 16px 4px 16px;
   justify-content: space-between;
   background-color: #fff;
 `;
@@ -13,13 +12,15 @@ export const HeaderText = styled.Text`
   line-height: 36px;
   color: #222222;
   padding-top: 48px;
+  text-align: center;
 `;
 
 export const Footer = styled.View`
   width: 100%;
+  padding: 16px 16px 4px 16px;
 `;
 
-export const LoginBtn = styled.TouchableOpacity`
+export const LoginButton = styled.TouchableOpacity`
   flex-direction: row;
   justify-content: center;
   align-items: center;
@@ -30,7 +31,7 @@ export const LoginBtn = styled.TouchableOpacity`
   margin-bottom: 12px;
 `;
 
-LoginBtn.Icon = styled.View`
+LoginButton.Icon = styled.View`
   justify-content: center;
   align-items: center;
   width: 28px;
@@ -38,7 +39,7 @@ LoginBtn.Icon = styled.View`
   margin-right: 8px;
 `;
 
-LoginBtn.Text = styled.Text`
+LoginButton.Text = styled.Text`
   text-align: center;
   font-size: 14px;
   font-weight: bold;
