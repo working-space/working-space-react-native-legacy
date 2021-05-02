@@ -42,7 +42,8 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     userToggleBookmark,
     userComments,
   } = DetailCafeDataStore;
-  const { latitude, longitude } = GeoLocationStore;
+  const { currentLocation } = GeoLocationStore;
+  const { latitude, longitude } = currentLocation;
 
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferredTags, setpreferredTags] = useState(userPreferredTags);
