@@ -5,6 +5,7 @@ import { css } from '@emotion/native';
 import { isEmpty } from 'lodash';
 import useStore from '~hooks/useStore';
 import { useFetchDetailCafeData, useFetchCommentsList } from '~hooks/useDetailData';
+import api from '../../api';
 
 import { DetailWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
 import Header from '~/components/Header/Header';
@@ -37,7 +38,12 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTags);
   const inputRef = useRef(null);
 
-  const { detailCafeData, cafeLikeCount, userPreferredTags, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError } = useFetchDetailCafeData(cafeId, userId, latitude, longitude);
+  const { detailCafeData, cafeLikeCount, userPreferredTags, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError } = useFetchDetailCafeData(
+    cafeId,
+    userId,
+    latitude,
+    longitude,
+  );
   const { comments, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
 
   const handleToggleLikeButton = useCallback(() => {
@@ -45,8 +51,15 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   }, []);
 
   const handleToggleBookmarkButton = useCallback(() => {
-    console.log('Change Bookmark');
-  }, []);
+    api
+      .post('/bookmarks/', {
+        id: `${cafeId}_${userId}`,
+        cafe_id: cafeId,
+        user_id: userId,
+      })
+      .then((res) => console.log(res.data))
+      .catch((error) => console.log(error));
+  }, [cafeId, userId]);
 
   const handleShareButton = async () => {
     try {

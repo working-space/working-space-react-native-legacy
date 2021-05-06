@@ -47,6 +47,7 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
     api
       .get('/bookmarks/', {
         params: {
+          cafe_id: cafeId,
           user_id: userId,
         },
       })
