@@ -8,10 +8,18 @@ import NoneImage from '~/assets/images/none-image.svg';
 import OptionIcon from '~/assets/icons/icon-option.svg';
 
 const CommentList = (props) => {
-  const { comments, hasNextComments, userComments, onSetCommentTextModal, onMoreCommentsButtonClick } = props;
+  const { comments, hasNextComments, userComments, onSetCommentTextModal, onCommentOptionModal, onMoreCommentsButtonClick } = props;
+
   const handleCommentTextModal = useCallback(() => {
     onSetCommentTextModal?.();
   }, [onSetCommentTextModal]);
+
+  const handleCommentOptionModal = useCallback(
+    (commentId) => {
+      onCommentOptionModal?.(commentId);
+    },
+    [onCommentOptionModal],
+  );
 
   const handleMoreCommentsButtonClick = useCallback(() => {
     onMoreCommentsButtonClick?.();
@@ -57,7 +65,7 @@ const CommentList = (props) => {
                           userComments.map((userComment) => {
                             return (
                               comment.id === userComment.id && (
-                                <TouchableOpacity key={userComment.id}>
+                                <TouchableOpacity key={userComment.id} onPress={() => handleCommentOptionModal(userComment.id)}>
                                   <OptionIcon />
                                 </TouchableOpacity>
                               )

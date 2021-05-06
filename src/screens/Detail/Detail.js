@@ -18,6 +18,7 @@ import ImageGrid from '~/components/ImageGrid/ImageGrid';
 import SetTags from '~/components/SetTags/SetTags';
 import InputText from '~/components/InputText/InputText';
 import LoadingBar from '~/components/LoadingBar/LoadingBar';
+import CommentOptionModal from '~/components/CommentOptionModal/CommentOptionModal';
 import BackIcon from '~/assets/icons/icon_back.svg';
 import ShareIcon from '~/assets/icons/icon_share.svg';
 import FavoriteIcon from '~/assets/icons/icon_favorite.svg';
@@ -47,6 +48,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { comments, commentsListData, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferredTags, setpreferredTags] = useState(userPreferredTagsData);
+  const [currentCommentId, setCurrentCommentId] = useState(null);
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTagsData);
   const inputRef = useRef(null);
 
@@ -91,7 +93,6 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
 
   const handleSetCommentText = useCallback(
     (text) => {
-      handleCloseBtn();
       api
         .post('/comments/', {
           id: `${cafeId}_${userId}`,
@@ -101,12 +102,26 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         })
         .then((res) => console.log(res.data))
         .catch((error) => console.log(error));
+      handleCloseBtn();
     },
     [cafeId, userId, handleCloseBtn],
   );
 
   const handleSetCommentTextModal = useCallback(() => {
     setVisibleInput('Comments');
+  }, []);
+
+  const handleDeleteComment = useCallback(() => {
+    api
+      .delete(`/comments/${currentCommentId}`)
+      .then((res) => console.log(res.data))
+      .catch((error) => console.log(error));
+    handleCloseBtn();
+  }, [currentCommentId, handleCloseBtn]);
+
+  const handleCommentOptionModal = useCallback((commentId) => {
+    setVisibleInput('CommentOption');
+    setCurrentCommentId(commentId);
   }, []);
 
   const handleSubmitBtn = () => {
@@ -116,6 +131,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
 
   const handleCloseBtn = useCallback(() => {
     setVisibleInput(null);
+    setCurrentCommentId(null);
     setSelectedTags([...preferredTags]);
   }, [preferredTags, setSelectedTags]);
 
@@ -163,6 +179,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
           userComments={userCommentsData.data}
           isCommentsLoading={isCommentsLoading}
           onSetCommentTextModal={handleSetCommentTextModal}
+          onCommentOptionModal={handleCommentOptionModal}
           onMoreCommentsButtonClick={() => {
             commentsListData.setSize(commentsListData.size + 1);
           }}
@@ -201,6 +218,17 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         useNativeDriver={true}
         onModalShow={() => inputRef.current.focus()}>
         <InputText usage="comment" onSetInputText={handleSetCommentText} inputRef={inputRef} />
+      </Modal>
+      <Modal
+        style={{ width: '100%', margin: 0 }}
+        backdropOpacity={0.3}
+        onBackButtonPress={handleCloseBtn}
+        isVisible={visibleInput === 'CommentOption'}
+        hideModalContentWhileAnimating={true}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        useNativeDriver={true}>
+        <CommentOptionModal onDeleteComment={handleDeleteComment} />
       </Modal>
     </>
   );
