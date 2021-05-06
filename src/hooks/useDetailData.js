@@ -112,9 +112,9 @@ export const useFetchCommentsList = (cafeId) => {
     comments.push(...results);
   }
 
-  const hasNextComments = commentsData[0]?.next;
+  const hasNextComments = commentsData[commentsListData.size - 1]?.next;
   const isCommentsLoading = commentsListData.data == null;
   const isCommentsError = commentsListData.error;
 
-  return { comments, hasNextComments, isCommentsLoading, isCommentsError };
+  return { comments, commentsListData, hasNextComments, isCommentsLoading, isCommentsError };
 };

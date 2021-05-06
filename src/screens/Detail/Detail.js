@@ -44,7 +44,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     isDetailCafeDataError,
   } = useFetchDetailCafeData(cafeId, userId, latitude, longitude);
 
-  const { comments, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
+  const { comments, commentsListData, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferredTags, setpreferredTags] = useState(userPreferredTagsData);
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTagsData);
@@ -89,10 +89,21 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     setVisibleInput('Tags');
   }, []);
 
-  const handleSetCommentText = useCallback(async (text) => {
-    await console.log(text);
-    await setVisibleInput(null);
-  }, []);
+  const handleSetCommentText = useCallback(
+    (text) => {
+      handleCloseBtn();
+      api
+        .post('/comments/', {
+          id: `${cafeId}_${userId}`,
+          cafe_id: cafeId,
+          user_id: userId,
+          content: text,
+        })
+        .then((res) => console.log(res.data))
+        .catch((error) => console.log(error));
+    },
+    [cafeId, userId, handleCloseBtn],
+  );
 
   const handleSetCommentTextModal = useCallback(() => {
     setVisibleInput('Comments');
@@ -103,10 +114,10 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     setpreferredTags([...selectedTags]);
   };
 
-  const handleCloseBtn = () => {
+  const handleCloseBtn = useCallback(() => {
     setVisibleInput(null);
     setSelectedTags([...preferredTags]);
-  };
+  }, [preferredTags, setSelectedTags]);
 
   if (isDetailCafeDataError || isCommentsError) {
     return <div>에러가 발생했습니다. 다시 시도해주세요!</div>;
@@ -153,7 +164,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
           isCommentsLoading={isCommentsLoading}
           onSetCommentTextModal={handleSetCommentTextModal}
           onMoreCommentsButtonClick={() => {
-            console.log('pageIndex +1');
+            commentsListData.setSize(commentsListData.size + 1);
           }}
         />
       </DetailWrapper>
