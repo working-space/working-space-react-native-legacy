@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Share } from 'react-native';
 import Modal from 'react-native-modal';
 import { css } from '@emotion/native';
 import { isEmpty } from 'lodash';
-import { toJS } from 'mobx';
-import { observer } from 'mobx-react-lite';
 import useStore from '~hooks/useStore';
+import { useFetchDetailCafeData, useFetchCommentsList } from '~hooks/useDetailData';
 
 import { DetailWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
 import Header from '~/components/Header/Header';
@@ -29,52 +28,17 @@ import useSelectedTags from '../../hooks/useSelectedTags';
 
 const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
-  const { DetailCafeDataStore, GeoLocationStore } = useStore();
-  const {
-    fetchDetailCafeData,
-    isFetching,
-    fetchedDetailCafeData,
-    fetchCommentsList,
-    fetchedCommentsList,
-    userPreferredTags,
-    cafeLikeCountData,
-    userToggleLike,
-    userToggleBookmark,
-    userComments,
-  } = DetailCafeDataStore;
+  const { GeoLocationStore } = useStore();
   const { currentLocation } = GeoLocationStore;
   const { latitude, longitude } = currentLocation;
 
   const [visibleInput, setVisibleInput] = useState(null);
   const [preferredTags, setpreferredTags] = useState(userPreferredTags);
-  const [currentPage, setCurrentPage] = useState(0);
-  const inputRef = useRef(null);
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTags);
+  const inputRef = useRef(null);
 
-  useEffect(() => {
-    getDetailCafeData();
-  }, [getDetailCafeData]);
-
-  const getDetailCafeData = useCallback(
-    async (page = 0) => {
-      try {
-        await fetchDetailCafeData(cafeId, userId, latitude, longitude, page);
-        setCurrentPage((prev) => prev + 1);
-      } catch (error) {
-        console.warn(error);
-      }
-    },
-    [cafeId, userId, latitude, longitude, fetchDetailCafeData],
-  );
-
-  const getCommentsList = useCallback(async () => {
-    try {
-      await fetchCommentsList(cafeId, currentPage);
-      setCurrentPage((prev) => prev + 1);
-    } catch (error) {
-      console.warn(error);
-    }
-  }, [cafeId, currentPage, fetchCommentsList]);
+  const { detailCafeData, cafeLikeCount, userPreferredTags, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError } = useFetchDetailCafeData(cafeId, userId, latitude, longitude);
+  const { comments, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
 
   const handleToggleLikeButton = useCallback(() => {
     console.log('Change Like');
@@ -87,7 +51,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   const handleShareButton = async () => {
     try {
       const result = await Share.share({
-        title: toJS(fetchedDetailCafeData.name),
+        title: detailCafeData.data.name,
         message: '작업하기 좋은 카페를 추천합니다!',
       });
       if (result.action === Share.shareAction) {
@@ -127,7 +91,11 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     setSelectedTags([...preferredTags]);
   };
 
-  if (fetchedDetailCafeData === null || isFetching) {
+  if (isDetailCafeDataError || isCommentsError) {
+    return <div>에러가 발생했습니다. 다시 시도해주세요!</div>;
+  }
+
+  if (detailCafeData.data === null || isDetailCafeDataLoading) {
     return <LoadingBar />;
   }
 
@@ -143,11 +111,11 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         right={
           <LinkIconWrapper>
             <LinkIconWrapper.Item onPress={handleToggleLikeButton}>
-              {userToggleLike ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
-              <LinkIconWrapper.Text>{toJS(cafeLikeCountData)}</LinkIconWrapper.Text>
+              {userToggleLikeCount.data ? <FavoriteFillIcon width="24" height="24" /> : <FavoriteIcon width="24" height="24" />}
+              <LinkIconWrapper.Text>{cafeLikeCount.data}</LinkIconWrapper.Text>
             </LinkIconWrapper.Item>
             <LinkIconWrapper.Item onPress={handleToggleBookmarkButton}>
-              {userToggleBookmark ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}
+              {userToggleBookmarkCount.data ? <BookmarkFillIcon width="24" height="24" /> : <BookmarkIcon width="24" height="24" />}
             </LinkIconWrapper.Item>
             <LinkIconWrapper.Item onPress={handleShareButton}>
               <ShareIcon width="24" height="24" />
@@ -156,16 +124,20 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         }
       />
       <DetailWrapper>
-        <DetailTitle title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
-        <ImageGrid title={toJS(fetchedDetailCafeData.name)} distance={`${Math.floor(toJS(fetchedDetailCafeData.dist.calculated))}m`} tags={toJS(fetchedDetailCafeData.tags)} />
-        <DetailInfo address={toJS(fetchedDetailCafeData.parcel_addr)} phone={toJS(fetchedDetailCafeData.phone)} />
+        <DetailTitle title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data.dist.calculated)}m`} tags={detailCafeData.data.tags} />
+        <ImageGrid title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data.dist.calculated)}m`} tags={detailCafeData.data.tags} />
+        <DetailInfo address={detailCafeData.data.parcel_addr} phone={detailCafeData.data.phone} />
         <DetailLocation />
-        <TagList tags={toJS(fetchedDetailCafeData.tags)} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
+        <TagList tags={detailCafeData.data.tags} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
         <CommentList
-          comments={toJS(fetchedCommentsList)}
-          userComments={toJS(userComments)}
+          comments={comments}
+          hasNextComments={hasNextComments}
+          userComments={userCommentsData.data}
+          isCommentsLoading={isCommentsLoading}
           onSetCommentTextModal={handleSetCommentTextModal}
-          onMoreCommentsButtonClick={() => getCommentsList(currentPage)}
+          onMoreCommentsButtonClick={() => {
+            console.log('pageIndex +1');
+          }}
         />
       </DetailWrapper>
       <Modal style={{ width: '100%', margin: 0 }} isVisible={visibleInput === 'Tags'} onBackButtonPress={handleCloseBtn} hideModalContentWhileAnimating={true} useNativeDriver={true}>
@@ -210,4 +182,4 @@ Detail.defaultProps = {
   userId: 'jiwon',
 };
 
-export default observer(Detail);
+export default Detail;

@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { TouchableOpacity } from 'react-native';
-import useStore from '~hooks/useStore';
 import { isEmpty } from 'lodash';
 import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage, CommentText, NoneItem } from './CommentList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
@@ -9,10 +8,7 @@ import NoneImage from '~/assets/images/none-image.svg';
 import OptionIcon from '~/assets/icons/icon-option.svg';
 
 const CommentList = (props) => {
-  const { comments, userComments, onSetCommentTextModal, onMoreCommentsButtonClick } = props;
-  const { DetailCafeDataStore } = useStore();
-  const { hasNextComments } = DetailCafeDataStore;
-
+  const { comments, hasNextComments, userComments, onSetCommentTextModal, onMoreCommentsButtonClick } = props;
   const handleCommentTextModal = useCallback(() => {
     onSetCommentTextModal?.();
   }, [onSetCommentTextModal]);
