@@ -33,18 +33,22 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { currentLocation } = GeoLocationStore;
   const { latitude, longitude } = currentLocation;
 
-  const [visibleInput, setVisibleInput] = useState(null);
-  const [preferredTags, setpreferredTags] = useState(userPreferredTags);
-  const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTags);
-  const inputRef = useRef(null);
+  const {
+    detailCafeData,
+    cafeLikeCount,
+    userPreferredTagsData,
+    userToggleLikeCount,
+    userToggleBookmarkCount,
+    userCommentsData,
+    isDetailCafeDataLoading,
+    isDetailCafeDataError,
+  } = useFetchDetailCafeData(cafeId, userId, latitude, longitude);
 
-  const { detailCafeData, cafeLikeCount, userPreferredTags, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError } = useFetchDetailCafeData(
-    cafeId,
-    userId,
-    latitude,
-    longitude,
-  );
   const { comments, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
+  const [visibleInput, setVisibleInput] = useState(null);
+  const [preferredTags, setpreferredTags] = useState(userPreferredTagsData);
+  const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTagsData);
+  const inputRef = useRef(null);
 
   const handleToggleLikeButton = useCallback(() => {
     console.log('Change Like');

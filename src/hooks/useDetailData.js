@@ -13,6 +13,7 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
       })
       .then((res) => res.data),
   );
+
   const cafeLikeCount = useSWR(['cafeLikeCount', cafeId], (_, cafeId) =>
     api
       .get('/ratings/', {
@@ -33,6 +34,8 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
       })
       .then((res) => res.data.results),
   );
+  const userPreferredTagsData = userPreferredTags.data ?? [];
+
   const userToggleLikeCount = useSWR(['userToggleLikeCount', cafeId, userId], (_, cafeId, userId) =>
     api
       .get('/ratings/', {
@@ -43,6 +46,7 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
       })
       .then((res) => res.data.count),
   );
+
   const userToggleBookmarkCount = useSWR(['userToggleBookmarkCount', userId], (_, userId) =>
     api
       .get('/bookmarks/', {
@@ -53,6 +57,7 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
       })
       .then((res) => res.data.count),
   );
+
   const userCommentsData = useSWR(['userCommentsData', cafeId, userId], (_, cafeId, userId) =>
     api
       .get('/comments/', {
@@ -74,7 +79,7 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
 
   const isDetailCafeDataError = detailCafeData.error || cafeLikeCount.error || userPreferredTags.error || userToggleLikeCount.error || userToggleBookmarkCount.error || userCommentsData.error;
 
-  return { detailCafeData, cafeLikeCount, userPreferredTags, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError };
+  return { detailCafeData, cafeLikeCount, userPreferredTags, userPreferredTagsData, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError };
 };
 
 export const useFetchCommentsList = (cafeId) => {

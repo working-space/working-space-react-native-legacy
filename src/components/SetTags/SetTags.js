@@ -14,7 +14,7 @@ const SetTags = ({ preferTags, onToggleTag, allTags }) => {
             `}
             key={i}>
             {rowTags.map((tag) => {
-              return <TagItem key={tag.id} showCount={false} tag={tag} selected={preferTags === null ? false : preferTags.includes(tag.id)} onClick={onToggleTag} />;
+              return <TagItem key={tag.id} showCount={false} tag={tag} selected={preferTags.includes(tag.id)} onClick={onToggleTag} />;
             })}
           </EditTags>
         );
