@@ -3,6 +3,8 @@ import useSWR, { useSWRInfinite } from 'swr';
 import api from '../api';
 
 export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
+  const { isCommentsLoading } = useFetchCommentsList(cafeId);
+
   const detailCafeData = useSWR(['detailCafeData', cafeId, latitude, longitude], (_, cafeId, latitude, longitude) =>
     api
       .get(`/cafes/${cafeId}`, {
@@ -75,11 +77,31 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
     userPreferredTags.data == null ||
     userToggleLikeCount.data == null ||
     userToggleBookmarkCount.data == null ||
-    userCommentsData.data == null;
+    userCommentsData.data == null ||
+    isCommentsLoading;
+
+  const isDetailCafeDataValidating =
+    detailCafeData.isValidating ||
+    cafeLikeCount.isValidating ||
+    userPreferredTags.isValidating ||
+    userToggleLikeCount.isValidating ||
+    userToggleBookmarkCount.isValidating ||
+    userCommentsData.isValidating;
 
   const isDetailCafeDataError = detailCafeData.error || cafeLikeCount.error || userPreferredTags.error || userToggleLikeCount.error || userToggleBookmarkCount.error || userCommentsData.error;
 
-  return { detailCafeData, cafeLikeCount, userPreferredTags, userPreferredTagsData, userToggleLikeCount, userToggleBookmarkCount, userCommentsData, isDetailCafeDataLoading, isDetailCafeDataError };
+  return {
+    detailCafeData,
+    cafeLikeCount,
+    userPreferredTags,
+    userPreferredTagsData,
+    userToggleLikeCount,
+    userToggleBookmarkCount,
+    userCommentsData,
+    isDetailCafeDataLoading,
+    isDetailCafeDataValidating,
+    isDetailCafeDataError,
+  };
 };
 
 export const useFetchCommentsList = (cafeId) => {

@@ -8,7 +8,7 @@ import NoneImage from '~/assets/images/none-image.svg';
 import OptionIcon from '~/assets/icons/icon-option.svg';
 
 const CommentList = (props) => {
-  const { comments, hasNextComments, userComments, onSetCommentTextModal, onCommentOptionModal, onMoreCommentsButtonClick } = props;
+  const { comments, commentsCount, hasNextComments, userComments, onSetCommentTextModal, onCommentOptionModal, onMoreCommentsButtonClick } = props;
 
   const handleCommentTextModal = useCallback(() => {
     onSetCommentTextModal?.();
@@ -31,7 +31,7 @@ const CommentList = (props) => {
         <CommentListBox.Header>
           <CommentListBox.Title>댓글</CommentListBox.Title>
           <SmallPersonFillIcon />
-          <CommentListBox.Count>{isEmpty(comments) ? 0 : comments.length}</CommentListBox.Count>
+          <CommentListBox.Count>{commentsCount}</CommentListBox.Count>
         </CommentListBox.Header>
         <CommentListBox.Input onPress={handleCommentTextModal}>
           <ProfileImage>

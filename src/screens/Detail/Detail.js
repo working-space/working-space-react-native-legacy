@@ -42,6 +42,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     userToggleBookmarkCount,
     userCommentsData,
     isDetailCafeDataLoading,
+    isDetailCafeDataValidating,
     isDetailCafeDataError,
   } = useFetchDetailCafeData(cafeId, userId, latitude, longitude);
 
@@ -56,16 +57,14 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     console.log('Change Like');
   }, []);
 
-  const handleToggleBookmarkButton = useCallback(() => {
-    api
-      .post('/bookmarks/', {
-        id: `${cafeId}_${userId}`,
-        cafe_id: cafeId,
-        user_id: userId,
-      })
-      .then((res) => console.log(res.data))
-      .catch((error) => console.log(error));
-  }, [cafeId, userId]);
+  const handleToggleBookmarkButton = useCallback(async () => {
+    await api.post('/bookmarks/', {
+      id: `${cafeId}_${userId}`,
+      cafe_id: cafeId,
+      user_id: userId,
+    });
+    userToggleBookmarkCount.mutate();
+  }, [cafeId, userId, userToggleBookmarkCount]);
 
   const handleShareButton = async () => {
     try {
@@ -92,32 +91,28 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   }, []);
 
   const handleSetCommentText = useCallback(
-    (text) => {
-      api
-        .post('/comments/', {
-          id: `${cafeId}_${userId}`,
-          cafe_id: cafeId,
-          user_id: userId,
-          content: text,
-        })
-        .then((res) => console.log(res.data))
-        .catch((error) => console.log(error));
+    async (text) => {
       handleCloseBtn();
+      await api.post('/comments/', {
+        id: `${cafeId}_${userId}`,
+        cafe_id: cafeId,
+        user_id: userId,
+        content: text,
+      });
+      commentsListData.mutate();
     },
-    [cafeId, userId, handleCloseBtn],
+    [cafeId, userId, handleCloseBtn, commentsListData],
   );
 
   const handleSetCommentTextModal = useCallback(() => {
     setVisibleInput('Comments');
   }, []);
 
-  const handleDeleteComment = useCallback(() => {
-    api
-      .delete(`/comments/${currentCommentId}`)
-      .then((res) => console.log(res.data))
-      .catch((error) => console.log(error));
+  const handleDeleteComment = useCallback(async () => {
     handleCloseBtn();
-  }, [currentCommentId, handleCloseBtn]);
+    await api.delete(`/comments/${currentCommentId}`);
+    commentsListData.mutate();
+  }, [currentCommentId, handleCloseBtn, commentsListData]);
 
   const handleCommentOptionModal = useCallback((commentId) => {
     setVisibleInput('CommentOption');
@@ -139,7 +134,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     return <div>에러가 발생했습니다. 다시 시도해주세요!</div>;
   }
 
-  if (detailCafeData.data === null || isDetailCafeDataLoading) {
+  if (detailCafeData.data === null || isDetailCafeDataLoading || isDetailCafeDataValidating) {
     return <LoadingBar />;
   }
 
@@ -175,6 +170,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         <TagList tags={detailCafeData.data.tags} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
         <CommentList
           comments={comments}
+          commentsCount={commentsListData.data[0]?.count}
           hasNextComments={hasNextComments}
           userComments={userCommentsData.data}
           isCommentsLoading={isCommentsLoading}
@@ -235,7 +231,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
 };
 
 Detail.defaultProps = {
-  userId: 'jiwon',
+  userId: 'jiwon3',
 };
 
 export default Detail;
