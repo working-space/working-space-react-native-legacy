@@ -6,12 +6,13 @@ import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import useStore from '~/hooks/useStore';
 import api from '~/api';
 import { requestPermissions } from '~/utils/permission';
-import { Container, SearchInput, Card, BottomView, MapButton } from './Map.styles';
+import { Container, SearchInput, Card, BottomView, MapButton, LoadingContainer, MapContainer } from './Map.styles';
 import Header from '~/components/Header/Header';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import MapMarker from '~/components/MapMarker/MapMarker';
 import SelectModal from '~/components/SelectModal/SelectModal';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
+import LoadingBar from '~/components/LoadingBar/LoadingBar';
 import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
 import MapPickerImage from '~/assets/icons/icon_mappicker.png';
@@ -143,8 +144,8 @@ const Map = ({ navigation }) => {
 
     if (!(latitude && longitude)) return;
 
-    mapRef.current.setCamera({ center: { latitude, longitude } });
     fetchCafes(latitude, longitude);
+    mapRef.current?.setCamera({ center: { latitude, longitude } });
   }, [currentLocation, fetchCafes]);
 
   useEffect(() => {
@@ -165,48 +166,59 @@ const Map = ({ navigation }) => {
           </Header.Button>
         }
       />
+
       <Container>
         <SearchInput onPress={() => navigation.navigate('Search')}>
           <SearchInput.PlaceHolder>현위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
         </SearchInput>
+        <MapContainer>
+          {markers.length <= 0 && (
+            <LoadingContainer>
+              <LoadingBar />
+            </LoadingContainer>
+          )}
+          <MapView
+            cacheEnabled={true}
+            loadingEnabled={true}
+            showsCompass={true}
+            showsUserLocation={true}
+            moveOnMarkerPress={false}
+            ref={mapRef}
+            provider={PROVIDER_GOOGLE}
+            style={css`
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              z-index: 1;
+            `}
+            initialRegion={{
+              latitude: 37.498095,
+              longitude: 127.02761,
+              latitudeDelta: 0.009,
+              longitudeDelta: 0.009,
+            }}
+            onPress={() => setSelectedMarker({})}
+            onRegionChangeComplete={handleRegionChange}>
+            {markers &&
+              Object.entries(markers).map((currentMarker) => {
+                const [locationKey, currentCafes] = currentMarker;
+                const [longitude, latitude] = locationKey.split(',').map(Number);
+                const cafe = currentCafes;
 
-        <MapView
-          cacheEnabled={true}
-          loadingEnabled={true}
-          showsCompass={true}
-          showsUserLocation={true}
-          moveOnMarkerPress={false}
-          ref={mapRef}
-          provider={PROVIDER_GOOGLE}
-          style={css`
-            flex: 1;
-          `}
-          initialRegion={{
-            latitude: 37.498095,
-            longitude: 127.02761,
-            latitudeDelta: 0.009,
-            longitudeDelta: 0.009,
-          }}
-          onPress={() => setSelectedMarker({})}
-          onRegionChangeComplete={handleRegionChange}>
-          {markers &&
-            Object.entries(markers).map((currentMarker) => {
-              const [locationKey, currentCafes] = currentMarker;
-              const [longitude, latitude] = locationKey.split(',').map(Number);
-              const cafe = currentCafes;
+                return (
+                  <MapMarker
+                    key={locationKey}
+                    coordinate={{ latitude, longitude }}
+                    image={selectedMarker.locationKey === locationKey ? MapPickerSelectImage : MapPickerImage}
+                    onPress={() => handleSelectMarker(locationKey, cafe)}
+                    tracksViewChanges={true}
+                    stopPropagation={true}
+                  />
+                );
+              })}
+          </MapView>
+        </MapContainer>
 
-              return (
-                <MapMarker
-                  key={locationKey}
-                  coordinate={{ latitude, longitude }}
-                  image={selectedMarker.locationKey === locationKey ? MapPickerSelectImage : MapPickerImage}
-                  onPress={() => handleSelectMarker(locationKey, cafe)}
-                  tracksViewChanges={true}
-                  stopPropagation={true}
-                />
-              );
-            })}
-        </MapView>
         <BottomView>
           <BottomView.Row>
             {currentRegion.latitude && currentRegion.longitude && (

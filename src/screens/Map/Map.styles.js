@@ -34,6 +34,7 @@ export const BottomView = styled.View`
   width: 100%;
   position: absolute;
   bottom: 0;
+  z-index: 2;
 `;
 
 BottomView.Row = styled.View`
@@ -63,4 +64,16 @@ export const MapButton = styled(FloatingActionButton)`
 MapButton.Text = styled.Text`
   padding: 4px 24px;
   font-size: 12px;
+`;
+
+export const MapContainer = styled.View`
+  flex: 1;
+`;
+
+export const LoadingContainer = styled.View`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: #ffffff;
+  z-index: 3;
 `;
