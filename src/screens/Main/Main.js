@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FlatList, View, Text, Animated } from 'react-native';
+import { FlatList, View, Animated } from 'react-native';
 import { css } from '@emotion/native';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { requestPermissions } from '~/utils/permission';
 import useStore from '~/hooks/useStore';
-import { Container, SearchInput, HeaderText, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
+import { Container, SearchInput, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
 import Header from '~/components/Header/Header';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
+import LoadingBar from '~/components/LoadingBar/LoadingBar';
+import FilterIllust from '~/components/FilterIllust/FilterIllust';
 import FILTER from '~/constants/filter';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
@@ -49,7 +51,6 @@ const Main = ({ navigation }) => {
     (event) => {
       const THRESHOLD = 220;
       // TODO: 스크롤 될 때마다 event가 과도하게 발생하므로 최적화 필요
-      // TODO: showScrolledListHeader가 변경될 때마다 이미지가 깜빡거리는 문제 수정 필요
       if (event.nativeEvent.contentOffset.y >= THRESHOLD) {
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -177,21 +178,11 @@ const Main = ({ navigation }) => {
 
             return <CafeListItem data={cafe} onCardLinkClick={handleCardLinkClick} />;
           }}
-          ListHeaderComponent={() => (
-            <>
-              <HeaderText>
-                현 위치에서{'\n'}
-                가장 {FILTER[nowFilter].name} 곳
-              </HeaderText>
-              {FILTER[nowFilter].imageURL}
-            </>
-          )}
+          ListHeaderComponent={<FilterIllust nowFilter={nowFilter} />}
           onEndReached={() => getCafeList(currentPage)}
           onEndReachedThreshold={0.9}
+          ListFooterComponent={isFetching && <LoadingBar top={20} color={'#e5e5e5'} />}
         />
-
-        {/* TODO: 임시 메시지. 추후 별도의 spinner 필요 */}
-        {isFetching && <Text>카페 리스트를 불러오고 있습니다.</Text>}
       </Container>
     </>
   );
