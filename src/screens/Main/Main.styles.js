@@ -23,13 +23,6 @@ SearchInput.PlaceHolder = styled.Text`
   color: #a7a7a7;
 `;
 
-export const HeaderText = styled.Text`
-  font-weight: 700;
-  font-size: 24px;
-  line-height: 36px;
-  color: #222222;
-`;
-
 export const ScrolledListHeader = styled.View`
   position: absolute;
   top: 0;
