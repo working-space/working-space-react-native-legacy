@@ -138,6 +138,8 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     return <LoadingBar />;
   }
 
+  const [cafeLongitude, cafeLatitude] = detailCafeData.data.location.coordinates;
+
   return (
     <>
       <Header
@@ -166,7 +168,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         <DetailTitle title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data.dist.calculated)}m`} tags={detailCafeData.data.tags} />
         <ImageGrid title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data.dist.calculated)}m`} tags={detailCafeData.data.tags} />
         <DetailInfo address={detailCafeData.data.parcel_addr} phone={detailCafeData.data.phone} />
-        <DetailLocation />
+        <DetailLocation latitude={cafeLatitude} longitude={cafeLongitude} />
         <TagList tags={detailCafeData.data.tags} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
         <CommentList
           comments={comments}
