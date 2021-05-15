@@ -58,11 +58,21 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   }, []);
 
   const handleToggleBookmarkButton = useCallback(async () => {
-    await api.post('/bookmarks/', {
-      id: `${cafeId}_${userId}`,
-      cafe_id: cafeId,
-      user_id: userId,
-    });
+    if (userToggleBookmarkCount.data) {
+      await api
+        .delete(`/bookmarks/${cafeId}_${userId}/`)
+        .then((res) => console.log(res))
+        .catch((error) => console.log(error));
+    } else {
+      await api
+        .post('/bookmarks/', {
+          id: `${cafeId}_${userId}`,
+          cafe_id: cafeId,
+          user_id: userId,
+        })
+        .then((res) => console.log(res))
+        .catch((error) => console.log(error));
+    }
     userToggleBookmarkCount.mutate();
   }, [cafeId, userId, userToggleBookmarkCount]);
 

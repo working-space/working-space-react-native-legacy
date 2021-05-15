@@ -80,13 +80,12 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
     userCommentsData.data == null ||
     isCommentsLoading;
 
-  const isDetailCafeDataValidating =
-    detailCafeData.isValidating ||
-    cafeLikeCount.isValidating ||
-    userPreferredTags.isValidating ||
-    userToggleLikeCount.isValidating ||
-    userToggleBookmarkCount.isValidating ||
-    userCommentsData.isValidating;
+  const isDetailCafeDataValidating = detailCafeData.isValidating;
+  // cafeLikeCount.isValidating ||
+  // userPreferredTags.isValidating ||
+  // userToggleLikeCount.isValidating ||
+  // userToggleBookmarkCount.isValidating ||
+  // userCommentsData.isValidating;
 
   const isDetailCafeDataError = detailCafeData.error || cafeLikeCount.error || userPreferredTags.error || userToggleLikeCount.error || userToggleBookmarkCount.error || userCommentsData.error;
 
