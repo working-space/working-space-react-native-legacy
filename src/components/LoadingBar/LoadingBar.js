@@ -2,12 +2,17 @@ import React from 'react';
 import { ActivityIndicator } from 'react-native';
 import styled from '@emotion/native';
 
-const LoadingBar = () => {
+const LoadingBar = (props) => {
   return (
-    <LoadingView>
-      <ActivityIndicator size="large" color="#ffbb44" />
+    <LoadingView marginTop={props.top}>
+      <ActivityIndicator size="large" color={props.color} />
     </LoadingView>
   );
+};
+
+LoadingBar.defaultProps = {
+  color: '#ffbb44',
+  top: 0,
 };
 
 export default LoadingBar;

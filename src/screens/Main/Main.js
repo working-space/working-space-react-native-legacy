@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FlatList, View, Text, Animated } from 'react-native';
+import { FlatList, View, Animated } from 'react-native';
 import { css } from '@emotion/native';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -10,6 +10,7 @@ import { Container, SearchInput, HeaderText, ScrolledListHeader, ListSeparator, 
 import Header from '~/components/Header/Header';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
+import LoadingBar from '~/components/LoadingBar/LoadingBar';
 import FILTER from '~/constants/filter';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
@@ -188,10 +189,8 @@ const Main = ({ navigation }) => {
           )}
           onEndReached={() => getCafeList(currentPage)}
           onEndReachedThreshold={0.9}
+          ListFooterComponent={isFetching && <LoadingBar top={20} color={'#e5e5e5'} />}
         />
-
-        {/* TODO: 임시 메시지. 추후 별도의 spinner 필요 */}
-        {isFetching && <Text>카페 리스트를 불러오고 있습니다.</Text>}
       </Container>
     </>
   );
