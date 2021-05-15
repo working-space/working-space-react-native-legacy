@@ -3,6 +3,7 @@ import styled from '@emotion/native';
 export const TagListWrapper = styled.View`
   width: 100%;
   flex: 1;
+  padding: 0 16px;
 `;
 
 export const TagListBox = styled.View`
@@ -15,7 +16,6 @@ TagListBox.Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0 16px;
   padding-bottom: 24px;
 `;
 

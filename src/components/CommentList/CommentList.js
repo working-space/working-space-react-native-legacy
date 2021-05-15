@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { TouchableOpacity } from 'react-native';
-import useStore from '~hooks/useStore';
 import { isEmpty } from 'lodash';
 import { CommentListWrapper, CommentListBox, CommentItem, CommentMoreButton, CommentItemTitle, ProfileImage, CommentText, NoneItem } from './CommentList.styles';
 import SmallPersonFillIcon from '~/assets/icons/icon_small_person_fill.svg';
@@ -9,13 +8,18 @@ import NoneImage from '~/assets/images/none-image.svg';
 import OptionIcon from '~/assets/icons/icon-option.svg';
 
 const CommentList = (props) => {
-  const { comments, userComments, onSetCommentTextModal, onMoreCommentsButtonClick } = props;
-  const { DetailCafeDataStore } = useStore();
-  const { hasNextComments } = DetailCafeDataStore;
+  const { comments, commentsCount, hasNextComments, userComments, onSetCommentTextModal, onCommentOptionModal, onMoreCommentsButtonClick } = props;
 
   const handleCommentTextModal = useCallback(() => {
     onSetCommentTextModal?.();
   }, [onSetCommentTextModal]);
+
+  const handleCommentOptionModal = useCallback(
+    (commentId) => {
+      onCommentOptionModal?.(commentId);
+    },
+    [onCommentOptionModal],
+  );
 
   const handleMoreCommentsButtonClick = useCallback(() => {
     onMoreCommentsButtonClick?.();
@@ -27,7 +31,7 @@ const CommentList = (props) => {
         <CommentListBox.Header>
           <CommentListBox.Title>댓글</CommentListBox.Title>
           <SmallPersonFillIcon />
-          <CommentListBox.Count>{isEmpty(comments) ? 0 : comments.length}</CommentListBox.Count>
+          <CommentListBox.Count>{commentsCount}</CommentListBox.Count>
         </CommentListBox.Header>
         <CommentListBox.Input onPress={handleCommentTextModal}>
           <ProfileImage>
@@ -61,7 +65,7 @@ const CommentList = (props) => {
                           userComments.map((userComment) => {
                             return (
                               comment.id === userComment.id && (
-                                <TouchableOpacity key={userComment.id}>
+                                <TouchableOpacity key={userComment.id} onPress={() => handleCommentOptionModal(userComment.id)}>
                                   <OptionIcon />
                                 </TouchableOpacity>
                               )
