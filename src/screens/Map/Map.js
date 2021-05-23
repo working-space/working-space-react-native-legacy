@@ -3,9 +3,7 @@ import { css } from '@emotion/native';
 import { observer } from 'mobx-react-lite';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
-import useStore from '~/hooks/useStore';
 import api from '~/api';
-import { requestPermissions } from '~/utils/permission';
 import { Container, SearchInput, Card, BottomView, MapButton, LoadingContainer, MapContainer } from './Map.styles';
 import Header from '~/components/Header/Header';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
@@ -17,10 +15,10 @@ import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
 import MapPickerImage from '~/assets/icons/icon_mappicker.png';
 import MapPickerSelectImage from '~/assets/icons/icon_mappicker_select.png';
+import useGeolocation from '../../hooks/useGeoLocation';
 
 const Map = ({ navigation }) => {
-  const { GeoLocationStore } = useStore();
-  const { currentLocation, getCurrentLocation } = GeoLocationStore;
+  const { geolocation, geocode, getGeolocation } = useGeolocation();
 
   const [currentRegion, setCurrentRegion] = useState({});
   const [cafes, setCafes] = useState([]);
@@ -84,7 +82,7 @@ const Map = ({ navigation }) => {
   }, [cafes]);
 
   const fetchCafes = useCallback(async (latitude, longitude) => {
-    const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&page=1`);
+    const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&limit=20`);
     setCafes(response.data.results);
   }, []);
 
@@ -128,22 +126,17 @@ const Map = ({ navigation }) => {
 
   const handleGetCurrentLocation = useCallback(() => {
     initializeMapScreen();
-    getCurrentLocation();
-  }, [getCurrentLocation]);
+    getGeolocation();
+  }, [getGeolocation]);
 
   useEffect(() => {
-    requestPermissions();
-    handleGetCurrentLocation();
-  }, [handleGetCurrentLocation]);
-
-  useEffect(() => {
-    const { latitude, longitude } = currentLocation;
+    const { latitude, longitude } = geolocation;
 
     if (!(latitude && longitude)) return;
 
     fetchCafes(latitude, longitude);
     mapRef.current?.setCamera({ center: { latitude, longitude } });
-  }, [currentLocation, fetchCafes]);
+  }, [geolocation, fetchCafes]);
 
   useEffect(() => {
     getMarkers();
@@ -166,7 +159,7 @@ const Map = ({ navigation }) => {
 
       <Container>
         <SearchInput onPress={() => navigation.navigate('Search')}>
-          <SearchInput.PlaceHolder>현위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
+          <SearchInput.PlaceHolder>현위치 : {geocode}</SearchInput.PlaceHolder>
         </SearchInput>
         <MapContainer>
           {markers.length <= 0 && (

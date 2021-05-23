@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { FlatList, View, Animated, ActivityIndicator } from 'react-native';
 import { css } from '@emotion/native';
 import { observer } from 'mobx-react-lite';
 
-import { requestPermissions } from '~/utils/permission';
-import useStore from '~/hooks/useStore';
 import { Container, SearchInput, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
 import Header from '~/components/Header/Header';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
@@ -14,12 +12,12 @@ import FILTER from '~/constants/filter';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
 import useCafeList from '../../hooks/useCafeList';
+import useGeolocation from '../../hooks/useGeoLocation';
 
 const Main = ({ navigation }) => {
-  const { GeoLocationStore } = useStore();
-  const { currentLocation, getCurrentLocation } = GeoLocationStore;
+  const { geolocation, getGeolocation, geocode } = useGeolocation();
 
-  const { cafeList, isLoading, size, setSize } = useCafeList(currentLocation);
+  const { cafeList, isLoading, size, setSize } = useCafeList(geolocation);
 
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST.id);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
@@ -36,7 +34,7 @@ const Main = ({ navigation }) => {
   };
 
   const handleRefresh = () => {
-    getCurrentLocation();
+    getGeolocation();
     setSize(1);
   };
 
@@ -71,11 +69,6 @@ const Main = ({ navigation }) => {
     },
     [navigation],
   );
-
-  useEffect(() => {
-    requestPermissions();
-    getCurrentLocation();
-  }, [getCurrentLocation]);
 
   return (
     <>
@@ -120,7 +113,7 @@ const Main = ({ navigation }) => {
       <Container>
         <View>
           <SearchInput onPress={() => navigation.navigate('Search')}>
-            <SearchInput.PlaceHolder>현 위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
+            <SearchInput.PlaceHolder>현 위치 : {geocode}</SearchInput.PlaceHolder>
           </SearchInput>
           <Animated.View style={{ opacity: fadeAnim, zIndex: 10 }}>
             <ScrolledListHeader>
