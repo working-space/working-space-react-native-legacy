@@ -113,12 +113,9 @@ const Map = ({ navigation }) => {
     selectMarker(locationKey, currentCafes[0]);
   };
 
-  const handlePressCafeListItem = useCallback(
-    (card) => {
-      navigation.navigate('Detail', { cardData: card });
-    },
-    [navigation],
-  );
+  const handleNavigateCafeDetail = () => {
+    navigation.navigate('Detail', { cafeId: selectedMarker.cafe.id });
+  };
 
   const handleSearchCurrentPosition = useCallback(() => {
     const { latitude, longitude } = currentRegion;
@@ -236,7 +233,7 @@ const Map = ({ navigation }) => {
           </BottomView.Row>
           {selectedMarker.cafe && (
             <Card>
-              <CafeListItem noBorder={true} data={selectedMarker.cafe} onCardLinkClick={() => handlePressCafeListItem(selectedMarker.cafe)} />
+              <CafeListItem noBorder={true} data={selectedMarker.cafe} onCardLinkClick={handleNavigateCafeDetail} />
             </Card>
           )}
         </BottomView>
