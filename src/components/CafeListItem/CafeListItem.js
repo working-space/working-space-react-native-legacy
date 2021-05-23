@@ -9,7 +9,7 @@ import FavoriteIcon from '~/assets/icons/icon_favorite.svg';
 import CommentIcon from '~/assets/icons/icon_comment.svg';
 import EditIcon from '~/assets/icons/icon_edit.svg';
 
-const CafeListItem = (props) => {
+const CafeListItem = React.memo((props) => {
   const { noBorder, onCardLinkClick } = props;
   const { title, distance, address, tags, badges, favoriteCount, commentCount } = props.data;
 
@@ -105,7 +105,7 @@ const CafeListItem = (props) => {
       </Item.InfoList>
     </Item>
   );
-};
+});
 
 CafeListItem.defaultProps = {
   data: {
