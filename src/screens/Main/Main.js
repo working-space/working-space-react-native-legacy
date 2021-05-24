@@ -1,35 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FlatList, View, Animated } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { FlatList, View, Animated, ActivityIndicator } from 'react-native';
 import { css } from '@emotion/native';
-import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { requestPermissions } from '~/utils/permission';
-import useStore from '~/hooks/useStore';
 import { Container, SearchInput, ScrolledListHeader, ListSeparator, FilterChangeButton, FilterSelect, Dimmed } from './Main.styles';
 import Header from '~/components/Header/Header';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
-import LoadingBar from '~/components/LoadingBar/LoadingBar';
 import FilterIllust from '~/components/FilterIllust/FilterIllust';
 import FILTER from '~/constants/filter';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
-
-const wait = (timeout) => {
-  return new Promise((resolve) => setTimeout(resolve, timeout));
-};
+import useCafeList from '../../hooks/useCafeList';
+import useGeolocation from '../../hooks/useGeoLocation';
 
 const Main = ({ navigation }) => {
-  const { AuthStore, CafeListStore, GeoLocationStore } = useStore();
-  const { logout } = AuthStore;
-  const { fetchCafeList, isFetching, fetchedCafeList } = CafeListStore;
-  const { currentLocation, getCurrentLocation } = GeoLocationStore;
+  const { geolocation, getGeolocation, geocode } = useGeolocation();
+
+  const { cafeList, isLoading, size, setSize } = useCafeList(geolocation);
 
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST.id);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -42,10 +33,10 @@ const Main = ({ navigation }) => {
     setIsSelectingFilter(false);
   };
 
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-    wait(2000).then(() => setRefreshing(false));
-  }, []);
+  const handleRefresh = () => {
+    getGeolocation();
+    setSize(1);
+  };
 
   const handleScroll = useCallback(
     (event) => {
@@ -68,38 +59,16 @@ const Main = ({ navigation }) => {
     [fadeAnim],
   );
 
+  const handleAdditionalLoad = () => {
+    if (!isLoading) setSize(size + 1);
+  };
+
   const handleCardLinkClick = useCallback(
     (cafe) => {
       navigation.navigate('Detail', { cafeId: cafe.id });
     },
     [navigation],
   );
-
-  const getCafeList = useCallback(
-    async (page = 1) => {
-      const { latitude, longitude } = currentLocation;
-      if (latitude && longitude) {
-        try {
-          await fetchCafeList(latitude, longitude, page);
-          setCurrentPage((prevState) => prevState + 1);
-        } catch (error) {
-          // TODO: 에러 핸들링 필요
-          // TODO: fetchCafeList와 try catch 문이 불필요하게 두번 사용되는 상황 변경 필요
-          console.warn(error);
-        }
-      }
-    },
-    [currentLocation, fetchCafeList],
-  );
-
-  useEffect(() => {
-    requestPermissions();
-    getCurrentLocation();
-  }, [getCurrentLocation]);
-
-  useEffect(() => {
-    getCafeList();
-  }, [getCafeList]);
 
   return (
     <>
@@ -144,7 +113,7 @@ const Main = ({ navigation }) => {
       <Container>
         <View>
           <SearchInput onPress={() => navigation.navigate('Search')}>
-            <SearchInput.PlaceHolder>현 위치 : 서울시 서초구 양재천로 131 4층</SearchInput.PlaceHolder>
+            <SearchInput.PlaceHolder>현 위치 : {geocode}</SearchInput.PlaceHolder>
           </SearchInput>
           <Animated.View style={{ opacity: fadeAnim, zIndex: 10 }}>
             <ScrolledListHeader>
@@ -160,8 +129,8 @@ const Main = ({ navigation }) => {
           `}
           onScroll={handleScroll}
           onRefresh={handleRefresh}
-          refreshing={refreshing}
-          data={toJS(fetchedCafeList)}
+          refreshing={cafeList.length !== 0 && isLoading}
+          data={cafeList}
           keyExtractor={(item) => item.id}
           ItemSeparatorComponent={() => <ListSeparator />}
           renderItem={({ item }) => {
@@ -179,9 +148,16 @@ const Main = ({ navigation }) => {
             return <CafeListItem data={cafe} onCardLinkClick={handleCardLinkClick} />;
           }}
           ListHeaderComponent={<FilterIllust nowFilter={nowFilter} />}
-          onEndReached={() => getCafeList(currentPage)}
-          onEndReachedThreshold={0.9}
-          ListFooterComponent={isFetching && <LoadingBar top={20} color={'#e5e5e5'} />}
+          onEndReached={handleAdditionalLoad}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            <View
+              style={css`
+                margin-top: 20px;
+              `}>
+              <ActivityIndicator size="large" color="#e5e5e5" />
+            </View>
+          }
         />
       </Container>
     </>

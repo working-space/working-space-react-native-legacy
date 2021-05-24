@@ -5,8 +5,11 @@ import Header from '~/components/Header/Header';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
 import { Container, SearchInput, ResultList, SearchGuide, TabContainer, Tab } from './Search.styles';
 import MapIcon from '~/assets/icons/icon_map.svg';
+import useGeolocation from '../../hooks/useGeoLocation';
 
 const Search = ({ navigation }) => {
+  const { geocode } = useGeolocation();
+
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchType, setSearchType] = useState('location');
 
@@ -32,7 +35,7 @@ const Search = ({ navigation }) => {
         <SearchInput
           autoFocus
           value={searchKeyword}
-          placeholder="현위치 : 서울시 서초구 양재천로 131 4층"
+          placeholder={`현 위치 : ${geocode}`}
           placeholderStyle={css`
             font-size: 12px;
             color: #a7a7a7;
