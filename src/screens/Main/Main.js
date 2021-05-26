@@ -12,7 +12,7 @@ import FILTER from '~/constants/filter';
 import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
 import useCafeList from '../../hooks/useCafeList';
-import useGeolocation from '../../hooks/useGeoLocation';
+import useGeolocation from '../../hooks/useGeolocation';
 
 const Main = ({ navigation }) => {
   const { geolocation, getGeolocation, geocode } = useGeolocation();

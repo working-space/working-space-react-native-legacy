@@ -15,7 +15,7 @@ import ListIcon from '~/assets/icons/icon_list.svg';
 import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
 import MapPickerImage from '~/assets/icons/icon_mappicker.png';
 import MapPickerSelectImage from '~/assets/icons/icon_mappicker_select.png';
-import useGeolocation from '../../hooks/useGeoLocation';
+import useGeolocation from '../../hooks/useGeolocation';
 
 const Map = ({ navigation }) => {
   const { geolocation, geocode, getGeolocation } = useGeolocation();
