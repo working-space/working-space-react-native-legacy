@@ -5,7 +5,7 @@ import Header from '~/components/Header/Header';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
 import { Container, SearchInput, ResultList, SearchGuide, TabContainer, Tab } from './Search.styles';
 import MapIcon from '~/assets/icons/icon_map.svg';
-import useGeolocation from '../../hooks/useGeoLocation';
+import useGeolocation from '../../hooks/useGeolocation';
 
 const Search = ({ navigation }) => {
   const { geocode } = useGeolocation();
