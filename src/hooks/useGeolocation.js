@@ -32,10 +32,14 @@ const useGeolocation = () => {
     );
   }, []);
 
-  useEffect(() => {
-    requestPermissions();
+  const getGeolocationWithPermission = useCallback(async () => {
+    await requestPermissions();
     getGeolocation();
   }, [getGeolocation]);
+
+  useEffect(() => {
+    getGeolocationWithPermission();
+  }, [getGeolocationWithPermission]);
 
   return { geolocation, isLoading, isError, geocode, isGeocodeLoading, isGeocodeError, getGeolocation };
 };
