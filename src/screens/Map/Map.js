@@ -16,10 +16,12 @@ import LocateActiveIcon from '~/assets/icons/icon_locate_active.svg';
 import MapPickerImage from '~/assets/icons/icon_mappicker.png';
 import MapPickerSelectImage from '~/assets/icons/icon_mappicker_select.png';
 import useGeolocation from '../../hooks/useGeolocation';
+import ErrorBox from '../../components/ErrorBox/ErrorBox';
 
 const Map = ({ navigation }) => {
   const { geolocation, geocode, getGeolocation } = useGeolocation();
 
+  const [isError, setError] = useState(false);
   const [currentRegion, setCurrentRegion] = useState({});
   const [cafes, setCafes] = useState([]);
   const [markers, setMarkers] = useState([]);
@@ -82,9 +84,18 @@ const Map = ({ navigation }) => {
   }, [cafes]);
 
   const fetchCafes = useCallback(async (latitude, longitude) => {
-    const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&limit=20`);
-    setCafes(response.data.results);
+    try {
+      const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&limit=20`);
+      setCafes(response.data.results);
+    } catch (error) {
+      setError(true);
+    }
   }, []);
+
+  const handleRetry = () => {
+    setError(false);
+    fetchCafes();
+  };
 
   const handleRegionChange = (region) => {
     if (!cafes || cafes.length <= 0) return;
@@ -161,76 +172,88 @@ const Map = ({ navigation }) => {
         <SearchInput onPress={() => navigation.navigate('Search')}>
           <SearchInput.PlaceHolder>현위치 : {geocode}</SearchInput.PlaceHolder>
         </SearchInput>
-        <MapContainer>
-          {markers.length <= 0 && (
-            <LoadingContainer>
-              <LoadingBar />
-            </LoadingContainer>
-          )}
-          <MapView
-            cacheEnabled={true}
-            loadingEnabled={true}
-            showsCompass={true}
-            showsUserLocation={true}
-            moveOnMarkerPress={false}
-            ref={mapRef}
-            provider={PROVIDER_GOOGLE}
-            style={css`
-              position: absolute;
-              width: 100%;
-              height: 100%;
-              z-index: 1;
-            `}
-            initialRegion={{
-              latitude: 37.498095,
-              longitude: 127.02761,
-              latitudeDelta: 0.009,
-              longitudeDelta: 0.009,
-            }}
-            onPress={() => setSelectedMarker({})}
-            onRegionChangeComplete={handleRegionChange}>
-            {markers &&
-              Object.entries(markers).map((currentMarker) => {
-                const [locationKey, currentCafes] = currentMarker;
-                const [longitude, latitude] = locationKey.split(',').map(Number);
-                const cafe = currentCafes;
+        {isError ? (
+          <ErrorBox>
+            <ErrorBox.Heading>앗!</ErrorBox.Heading>
+            <ErrorBox.Message>카페 목록을 불러오지 못했어요!</ErrorBox.Message>
+            <ErrorBox.RetryButton onPress={handleRetry}>
+              <ErrorBox.RetryText>다시 시도하기</ErrorBox.RetryText>
+            </ErrorBox.RetryButton>
+          </ErrorBox>
+        ) : (
+          <>
+            <MapContainer>
+              {markers.length <= 0 && (
+                <LoadingContainer>
+                  <LoadingBar />
+                </LoadingContainer>
+              )}
+              <MapView
+                cacheEnabled={true}
+                loadingEnabled={true}
+                showsCompass={true}
+                showsUserLocation={true}
+                moveOnMarkerPress={false}
+                ref={mapRef}
+                provider={PROVIDER_GOOGLE}
+                style={css`
+                  position: absolute;
+                  width: 100%;
+                  height: 100%;
+                  z-index: 1;
+                `}
+                initialRegion={{
+                  latitude: 37.498095,
+                  longitude: 127.02761,
+                  latitudeDelta: 0.009,
+                  longitudeDelta: 0.009,
+                }}
+                onPress={() => setSelectedMarker({})}
+                onRegionChangeComplete={handleRegionChange}>
+                {markers &&
+                  Object.entries(markers).map((currentMarker) => {
+                    const [locationKey, currentCafes] = currentMarker;
+                    const [longitude, latitude] = locationKey.split(',').map(Number);
+                    const cafe = currentCafes;
 
-                return (
-                  <MapMarker
-                    key={locationKey}
-                    coordinate={{ latitude, longitude }}
-                    image={selectedMarker.locationKey === locationKey ? MapPickerSelectImage : MapPickerImage}
-                    onPress={() => handleSelectMarker(locationKey, cafe)}
-                    tracksViewChanges={true}
-                    stopPropagation={true}
-                  />
-                );
-              })}
-          </MapView>
-        </MapContainer>
+                    return (
+                      <MapMarker
+                        key={locationKey}
+                        coordinate={{ latitude, longitude }}
+                        image={selectedMarker.locationKey === locationKey ? MapPickerSelectImage : MapPickerImage}
+                        onPress={() => handleSelectMarker(locationKey, cafe)}
+                        tracksViewChanges={true}
+                        stopPropagation={true}
+                      />
+                    );
+                  })}
+              </MapView>
+            </MapContainer>
 
-        <BottomView>
-          <BottomView.Row>
-            {currentRegion.latitude && currentRegion.longitude && (
-              <BottomView.RowItem>
-                <MapButton onPress={handleSearchCurrentPosition}>
-                  <MapButton.Text>현재 위치에서 검색하기</MapButton.Text>
-                </MapButton>
-              </BottomView.RowItem>
-            )}
-            <BottomView.RowItem align="right">
-              <MapButton onPress={handleGetCurrentLocation}>
-                <LocateActiveIcon />
-              </MapButton>
-            </BottomView.RowItem>
-          </BottomView.Row>
-          {selectedMarker.cafe && (
-            <Card>
-              <CafeListItem noBorder={true} data={selectedMarker.cafe} onCardLinkClick={handleNavigateCafeDetail} />
-            </Card>
-          )}
-        </BottomView>
-        <SelectModal cafes={selectingStatus.cafes} isVisible={isSelectModalVisible} onToggle={toggleModal} onSubmit={handleSubmitSelectModal} />
+            <BottomView>
+              <BottomView.Row>
+                {currentRegion.latitude && currentRegion.longitude && (
+                  <BottomView.RowItem>
+                    <MapButton onPress={handleSearchCurrentPosition}>
+                      <MapButton.Text>현재 위치에서 검색하기</MapButton.Text>
+                    </MapButton>
+                  </BottomView.RowItem>
+                )}
+                <BottomView.RowItem align="right">
+                  <MapButton onPress={handleGetCurrentLocation}>
+                    <LocateActiveIcon />
+                  </MapButton>
+                </BottomView.RowItem>
+              </BottomView.Row>
+              {selectedMarker.cafe && (
+                <Card>
+                  <CafeListItem noBorder={true} data={selectedMarker.cafe} onCardLinkClick={handleNavigateCafeDetail} />
+                </Card>
+              )}
+            </BottomView>
+            <SelectModal cafes={selectingStatus.cafes} isVisible={isSelectModalVisible} onToggle={toggleModal} onSubmit={handleSubmitSelectModal} />
+          </>
+        )}
       </Container>
     </>
   );
