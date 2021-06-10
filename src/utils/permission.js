@@ -1,3 +1,4 @@
+// Note: 현재 사용하지 않는 코드 파일. 추후 삭제 예정
 import { requestMultiple, checkMultiple, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const permissions = [PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION, PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION];

@@ -16,7 +16,7 @@ import useGeolocation from '../../hooks/useGeolocation';
 import ErrorBox from '../../components/ErrorBox/ErrorBox';
 
 const Main = ({ navigation }) => {
-  const { geolocation, getGeolocation, geocode } = useGeolocation();
+  const { geolocation, getGeolocation, geocode, permissionStatus, isError: isGeolocationError } = useGeolocation();
 
   const { cafeList, isLoading, size, setSize, isError } = useCafeList(geolocation);
 
@@ -122,10 +122,11 @@ const Main = ({ navigation }) => {
             </ScrolledListHeader>
           </Animated.View>
         </View>
-        {isError ? (
+        {isError || isGeolocationError ? (
           <ErrorBox>
             <ErrorBox.Heading>앗!</ErrorBox.Heading>
             <ErrorBox.Message>카페 목록을 불러오지 못했어요!</ErrorBox.Message>
+            {permissionStatus === 'denied' && <ErrorBox.Message>카페 목록을 불러오기 위해서{'\n'}위치 권한을 허용해주세요</ErrorBox.Message>}
             <ErrorBox.RetryButton onPress={handleRefresh}>
               <ErrorBox.RetryText>다시 시도하기</ErrorBox.RetryText>
             </ErrorBox.RetryButton>

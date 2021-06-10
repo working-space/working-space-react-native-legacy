@@ -15,6 +15,8 @@ export const Heading = styled.Text`
 
 export const Message = styled.Text`
   font-size: 16px;
+  text-align: center;
+  margin-bottom: 8px;
 `;
 
 export const RetryButton = styled.TouchableOpacity`
