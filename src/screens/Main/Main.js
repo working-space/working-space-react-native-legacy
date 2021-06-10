@@ -13,11 +13,12 @@ import MapIcon from '~/assets/icons/icon_map.svg';
 import DropDownArrowIcon from '~/assets/icons/icon_dropdown_arrow.svg';
 import useCafeList from '../../hooks/useCafeList';
 import useGeolocation from '../../hooks/useGeolocation';
+import ErrorBox from '../../components/ErrorBox/ErrorBox';
 
 const Main = ({ navigation }) => {
-  const { geolocation, getGeolocation, geocode } = useGeolocation();
+  const { geolocation, getGeolocation, geocode, permissionStatus, isError: isGeolocationError } = useGeolocation();
 
-  const { cafeList, isLoading, size, setSize } = useCafeList(geolocation);
+  const { cafeList, isLoading, size, setSize, isError } = useCafeList(geolocation);
 
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST.id);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
@@ -121,44 +122,54 @@ const Main = ({ navigation }) => {
             </ScrolledListHeader>
           </Animated.View>
         </View>
+        {isError || isGeolocationError ? (
+          <ErrorBox>
+            <ErrorBox.Heading>앗!</ErrorBox.Heading>
+            <ErrorBox.Message>카페 목록을 불러오지 못했어요!</ErrorBox.Message>
+            {permissionStatus === 'denied' && <ErrorBox.Message>카페 목록을 불러오기 위해서{'\n'}위치 권한을 허용해주세요</ErrorBox.Message>}
+            <ErrorBox.RetryButton onPress={handleRefresh}>
+              <ErrorBox.RetryText>다시 시도하기</ErrorBox.RetryText>
+            </ErrorBox.RetryButton>
+          </ErrorBox>
+        ) : (
+          <FlatList
+            contentContainerStyle={css`
+              margin: 0 16px;
+              padding-bottom: 24px;
+            `}
+            onScroll={handleScroll}
+            onRefresh={handleRefresh}
+            refreshing={cafeList.length !== 0 && isLoading}
+            data={cafeList}
+            keyExtractor={(item) => item.id}
+            ItemSeparatorComponent={() => <ListSeparator />}
+            renderItem={({ item }) => {
+              const { id, name, dist, road_addr, tags } = item;
+              const distance = `${Math.floor(dist.calculated)}m`;
 
-        <FlatList
-          contentContainerStyle={css`
-            margin: 0 16px;
-            padding-bottom: 24px;
-          `}
-          onScroll={handleScroll}
-          onRefresh={handleRefresh}
-          refreshing={cafeList.length !== 0 && isLoading}
-          data={cafeList}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => <ListSeparator />}
-          renderItem={({ item }) => {
-            const { id, name, dist, road_addr, tags } = item;
-            const distance = `${Math.floor(dist.calculated)}m`;
+              const cafe = {
+                id: id,
+                title: name,
+                distance,
+                address: road_addr,
+                tags,
+              };
 
-            const cafe = {
-              id: id,
-              title: name,
-              distance,
-              address: road_addr,
-              tags,
-            };
-
-            return <CafeListItem data={cafe} onCardLinkClick={handleCardLinkClick} />;
-          }}
-          ListHeaderComponent={<FilterIllust nowFilter={nowFilter} />}
-          onEndReached={handleAdditionalLoad}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            <View
-              style={css`
-                margin-top: 20px;
-              `}>
-              <ActivityIndicator size="large" color="#e5e5e5" />
-            </View>
-          }
-        />
+              return <CafeListItem data={cafe} onCardLinkClick={handleCardLinkClick} />;
+            }}
+            ListHeaderComponent={<FilterIllust nowFilter={nowFilter} />}
+            onEndReached={handleAdditionalLoad}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              <View
+                style={css`
+                  margin-top: 20px;
+                `}>
+                <ActivityIndicator size="large" color="#e5e5e5" />
+              </View>
+            }
+          />
+        )}
       </Container>
     </>
   );

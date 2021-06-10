@@ -3,7 +3,6 @@ import { Share } from 'react-native';
 import Modal from 'react-native-modal';
 import { css } from '@emotion/native';
 import { isEmpty } from 'lodash';
-import useStore from '~hooks/useStore';
 import { useFetchDetailCafeData, useFetchCommentsList } from '~hooks/useDetailData';
 import api from '../../api';
 
@@ -27,12 +26,14 @@ import BookmarkIcon from '~/assets/icons/icon_bookmark.svg';
 import BookmarkFillIcon from '~/assets/icons/icon_bookmark_fill.svg';
 import CloseIcon from '~/assets/icons/icon_close.svg';
 import useSelectedTags from '../../hooks/useSelectedTags';
+import ErrorBox from '../../components/ErrorBox/ErrorBox';
+import useGeolocation from '../../hooks/useGeolocation';
 
 const Detail = ({ userId, route, navigation: { goBack } }) => {
   const { cafeId } = route.params;
-  const { GeoLocationStore } = useStore();
-  const { currentLocation } = GeoLocationStore;
-  const { latitude, longitude } = currentLocation;
+
+  const { geolocation } = useGeolocation();
+  const { latitude, longitude } = geolocation;
 
   const {
     detailCafeData,
@@ -92,7 +93,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         // dismissed
       }
     } catch (error) {
-      alert(error.message);
+      console.log(error.message);
     }
   };
 
@@ -141,7 +142,12 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
   }, [preferredTags, setSelectedTags]);
 
   if (isDetailCafeDataError || isCommentsError) {
-    return <div>에러가 발생했습니다. 다시 시도해주세요!</div>;
+    return (
+      <ErrorBox>
+        <ErrorBox.Heading>앗!</ErrorBox.Heading>
+        <ErrorBox.Message>카페 정보를 불러오지 못했어요!</ErrorBox.Message>
+      </ErrorBox>
+    );
   }
 
   if (detailCafeData.data === null || isDetailCafeDataLoading || isDetailCafeDataValidating) {
@@ -175,8 +181,8 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
         }
       />
       <DetailWrapper>
-        <DetailTitle title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data.dist.calculated)}m`} tags={detailCafeData.data.tags} />
-        <ImageGrid title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data.dist.calculated)}m`} tags={detailCafeData.data.tags} />
+        <DetailTitle title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data?.dist?.calculated)}m`} tags={detailCafeData.data.tags} />
+        <ImageGrid title={detailCafeData.data.name} distance={`${Math.floor(detailCafeData.data?.dist?.calculated)}m`} tags={detailCafeData.data.tags} />
         <DetailInfo address={detailCafeData.data.parcel_addr} phone={detailCafeData.data.phone} />
         <DetailLocation latitude={cafeLatitude} longitude={cafeLongitude} />
         <TagList tags={detailCafeData.data.tags} preferTags={preferredTags} onSetTagsModal={handleSetTagsModal} />
