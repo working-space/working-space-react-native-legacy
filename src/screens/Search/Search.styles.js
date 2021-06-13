@@ -8,10 +8,11 @@ export const Container = styled.View`
 
 export const SearchInput = styled.TextInput`
   height: 40px;
-  border: 1px solid #cccccc;
+  border: 1px solid ${({ isFocusing }) => (isFocusing ? '#222222' : '#cccccc')};
   border-radius: 20px;
-  padding: 0 12px;
-  margin: 8px 16px;
+  padding: 0 16px;
+  margin: 24px 16px;
+  font-size: 12px;
 `;
 
 export const ResultContainer = styled.View`
@@ -20,21 +21,26 @@ export const ResultContainer = styled.View`
 `;
 
 export const TabContainer = styled.View`
-  margin-top: 16px;
   flex-direction: row;
   justify-content: center;
+  margin: 0 16px;
+  margin-top: 8px;
 `;
 
 export const Tab = styled.TouchableOpacity`
-  padding: 0 20px;
+  flex: 1;
   z-index: 10;
+  border-style: solid;
+  border-bottom-width: 1px;
+  border-color: ${({ active }) => (active ? '#ffbb44' : '#f0f0f0')};
+  padding: 12px 0;
+  align-items: center;
 `;
 
 Tab.Text = styled.Text`
   font-size: 14px;
   font-weight: bold;
   color: ${({ active }) => (active ? '#000000' : '#a7a7a7')};
-  padding-bottom: 8px;
 `;
 
 Tab.BottomLine = styled.View`
@@ -45,7 +51,7 @@ Tab.BottomLine = styled.View`
 
 export const ResultList = styled.ScrollView`
   flex: 1;
-  background-color: ${({ active }) => (active ? '#ffffff' : '#f0f0f0')};
+  background-color: ${({ active }) => (active ? '#ffffff' : '#fafafa')};
   border-style: solid;
   border-top-width: ${({ active }) => (active ? '1px' : '0')};
   border-top-color: #cccccc;
@@ -66,11 +72,14 @@ ResultList.Text = styled.Text`
 
 export const SearchGuide = styled.View`
   padding: 24px 16px;
+  margin-top: 76px;
+  align-items: center;
 `;
 
 SearchGuide.Text = styled.Text`
   font-size: ${({ small }) => (small ? '12px' : '14px')};
   line-height: 24px;
-  color: ${({ small }) => (small ? '#a7a7a7' : '#000000')};
+  color: ${({ small }) => (small ? '#cccccc' : '#a7a7a7')};
   margin-bottom: 8px;
+  text-align: center;
 `;

@@ -114,11 +114,11 @@ const Main = ({ navigation }) => {
       <Container>
         <View>
           <SearchInput onPress={() => navigation.navigate('Search')}>
-            <SearchInput.PlaceHolder>현 위치 : {geocode}</SearchInput.PlaceHolder>
+            <SearchInput.PlaceHolder>현위치 : {geocode}</SearchInput.PlaceHolder>
           </SearchInput>
           <Animated.View style={{ opacity: fadeAnim, zIndex: 10 }}>
             <ScrolledListHeader>
-              <ScrolledListHeader.Text>현 위치에서 가장 {FILTER[nowFilter].name} 곳</ScrolledListHeader.Text>
+              <ScrolledListHeader.Text>현위치에서 가장 {FILTER[nowFilter].name} 곳</ScrolledListHeader.Text>
             </ScrolledListHeader>
           </Animated.View>
         </View>
