@@ -29,7 +29,6 @@ export const TabContainer = styled.View`
 
 export const Tab = styled.TouchableOpacity`
   flex: 1;
-  z-index: 10;
   border-style: solid;
   border-bottom-width: 1px;
   border-color: ${({ active }) => (active ? '#ffbb44' : '#f0f0f0')};
@@ -43,20 +42,9 @@ Tab.Text = styled.Text`
   color: ${({ active }) => (active ? '#000000' : '#a7a7a7')};
 `;
 
-Tab.BottomLine = styled.View`
-  width: 100%;
-  height: 1px;
-  background-color: #222222;
-`;
-
 export const ResultList = styled.ScrollView`
   flex: 1;
   background-color: ${({ active }) => (active ? '#ffffff' : '#fafafa')};
-  border-style: solid;
-  border-top-width: ${({ active }) => (active ? '1px' : '0')};
-  border-top-color: #cccccc;
-  margin-top: -1px;
-  z-index: 9;
 `;
 
 ResultList.Item = styled.TouchableOpacity`
@@ -82,4 +70,8 @@ SearchGuide.Text = styled.Text`
   color: ${({ small }) => (small ? '#cccccc' : '#a7a7a7')};
   margin-bottom: 8px;
   text-align: center;
+`;
+
+export const ListSeparator = styled.View`
+  margin-bottom: 8px;
 `;
