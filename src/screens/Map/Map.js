@@ -83,7 +83,7 @@ const Map = ({ navigation }) => {
     setMarkers(newMarkers);
   }, [cafes]);
 
-  const fetchCafes = useCallback(async (latitude, longitude) => {
+  const getCafes = useCallback(async (latitude, longitude) => {
     try {
       const response = await api.get(`/cafes/?lat=${latitude}&lon=${longitude}&limit=20`);
       setCafes(response.data.results);
@@ -94,7 +94,7 @@ const Map = ({ navigation }) => {
 
   const handleRetry = () => {
     setError(false);
-    fetchCafes();
+    getCafes();
   };
 
   const handleRegionChange = (region) => {
@@ -132,22 +132,26 @@ const Map = ({ navigation }) => {
     if (!(latitude && longitude)) return;
 
     initializeMapScreen();
-    fetchCafes(latitude, longitude);
-  }, [currentRegion, fetchCafes]);
+    getCafes(latitude, longitude);
+  }, [currentRegion, getCafes]);
 
   const handleGetCurrentLocation = useCallback(() => {
     initializeMapScreen();
     getGeolocation();
   }, [getGeolocation]);
 
-  useEffect(() => {
+  const fetchCafes = useCallback(async () => {
     const { latitude, longitude } = geolocation;
 
     if (!(latitude && longitude)) return;
 
-    fetchCafes(latitude, longitude);
+    await getCafes(latitude, longitude);
     mapRef.current?.setCamera({ center: { latitude, longitude } });
-  }, [geolocation, fetchCafes]);
+  }, [geolocation, getCafes]);
+
+  useEffect(() => {
+    fetchCafes();
+  }, [fetchCafes]);
 
   useEffect(() => {
     getMarkers();
