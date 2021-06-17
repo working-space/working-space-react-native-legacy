@@ -10,9 +10,8 @@ export const SearchInput = styled.TextInput`
   height: 40px;
   border: 1px solid ${({ isFocusing }) => (isFocusing ? '#222222' : '#cccccc')};
   border-radius: 20px;
-  padding: 0 16px;
-  margin: 24px 16px;
-  font-size: 12px;
+  padding: 0 12px;
+  margin: 8px 16px;
 `;
 
 export const ResultContainer = styled.View`
@@ -24,7 +23,6 @@ export const TabContainer = styled.View`
   flex-direction: row;
   justify-content: center;
   margin: 0 16px;
-  margin-top: 8px;
 `;
 
 export const Tab = styled.TouchableOpacity`

@@ -56,14 +56,6 @@ const Search = ({ navigation }) => {
         }
       />
       <Container>
-        <TabContainer>
-          <Tab onPress={() => handleChangeSearchType('location')} active={searchType === 'location'}>
-            <Tab.Text active={searchType === 'location'}>지역 검색</Tab.Text>
-          </Tab>
-          <Tab onPress={() => handleChangeSearchType('cafe')} active={searchType === 'cafe'}>
-            <Tab.Text active={searchType === 'cafe'}>카페 검색</Tab.Text>
-          </Tab>
-        </TabContainer>
         <SearchInput
           autoFocus
           value={searchKeyword}
@@ -79,6 +71,14 @@ const Search = ({ navigation }) => {
           onBlur={() => setFocusing(false)}
           isFocusing={isFocusing}
         />
+        <TabContainer>
+          <Tab onPress={() => handleChangeSearchType('location')} active={searchType === 'location'}>
+            <Tab.Text active={searchType === 'location'}>지역 검색</Tab.Text>
+          </Tab>
+          <Tab onPress={() => handleChangeSearchType('cafe')} active={searchType === 'cafe'}>
+            <Tab.Text active={searchType === 'cafe'}>카페 검색</Tab.Text>
+          </Tab>
+        </TabContainer>
         {debouncedSearchKeyword ? (
           <FlatList
             contentContainerStyle={css`
