@@ -14,11 +14,6 @@ export const SearchInput = styled.TextInput`
   margin: 8px 16px;
 `;
 
-export const ResultContainer = styled.View`
-  flex: 1;
-  margin: 16px 0;
-`;
-
 export const TabContainer = styled.View`
   flex-direction: row;
   justify-content: center;

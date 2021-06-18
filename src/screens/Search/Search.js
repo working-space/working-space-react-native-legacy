@@ -1,16 +1,15 @@
 import React, { useState, useMemo } from 'react';
+import { ActivityIndicator, View, FlatList } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { css } from '@emotion/native';
 import Header from '~/components/Header/Header';
 import ProfileIcon from '~/components/ProfileIcon/ProfileIcon';
 import { Container, SearchInput, ResultList, SearchGuide, TabContainer, Tab, ListSeparator } from './Search.styles';
 import MapIcon from '~/assets/icons/icon_map.svg';
-import useGeolocation from '../../hooks/useGeolocation';
+import useGeolocation from '~/hooks/useGeolocation';
 import useCafeList from '~/hooks/useCafeList';
 import useDebounce from '~/hooks/useDebounce';
 import CafeListItem from '~/components/CafeListItem/CafeListItem';
-import { FlatList } from 'react-native-gesture-handler';
-import { ActivityIndicator, View } from 'react-native';
 import ErrorBox from '~/components/ErrorBox/ErrorBox';
 
 const Search = ({ navigation }) => {
@@ -73,7 +72,7 @@ const Search = ({ navigation }) => {
         />
         <TabContainer>
           <Tab onPress={() => handleChangeSearchType('location')} active={searchType === 'location'}>
-            <Tab.Text active={searchType === 'location'}>지역 검색</Tab.Text>
+            <Tab.Text active={searchType === 'location'}>위치 검색</Tab.Text>
           </Tab>
           <Tab onPress={() => handleChangeSearchType('cafe')} active={searchType === 'cafe'}>
             <Tab.Text active={searchType === 'cafe'}>카페 검색</Tab.Text>
@@ -83,7 +82,7 @@ const Search = ({ navigation }) => {
           <FlatList
             contentContainerStyle={css`
               margin: 0 16px;
-              padding-bottom: 24px;
+              padding: 24px 0;
             `}
             data={cafeList}
             keyExtractor={(item) => item.id}
@@ -102,6 +101,14 @@ const Search = ({ navigation }) => {
             }}
             onEndReached={handleAdditionalLoad}
             onEndReachedThreshold={0.2}
+            ListEmptyComponent={
+              cafeList.length === 0 &&
+              !isLoading && (
+                <SearchGuide>
+                  <SearchGuide.Text>검색 결과가 없습니다</SearchGuide.Text>
+                </SearchGuide>
+              )
+            }
             ListFooterComponent={
               <View
                 style={css`
