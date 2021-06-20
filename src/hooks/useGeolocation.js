@@ -1,20 +1,15 @@
 import { useState, useCallback, useEffect } from 'react';
-import Geolocation from 'react-native-geolocation-service';
-import useGeocode from './useGeocode';
 import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
+import useStore from './useStore';
+import API_STATUS from '~/constants/apiStatus';
 
 const permissions = [PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION, PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION];
 
 const useGeolocation = () => {
-  const [permissionStatus, setPermissionStatus] = useState(null);
-  const [isLoading, setLoading] = useState(false);
-  const [isError, setError] = useState(false);
-  const [geolocation, setGeolocation] = useState({
-    latitude: null,
-    longitude: null,
-  });
+  const { GeoLocationStore } = useStore();
+  const { geolocation, geocode, status, getGeolocation } = GeoLocationStore;
 
-  const { geocode, isLoading: isGeocodeLoading, isError: isGeocodeError } = useGeocode(geolocation);
+  const [permissionStatus, setPermissionStatus] = useState(null);
 
   const requestPermissions = useCallback(
     () =>
@@ -31,37 +26,18 @@ const useGeolocation = () => {
     [],
   );
 
-  const getCurrentPosition = useCallback(() => {
-    setLoading(true);
-    setError(false);
-
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-
-        setGeolocation({ latitude, longitude });
-        setLoading(false);
-        setError(false);
-      },
-      (err) => {
-        console.log(err.code, err.message);
-        setLoading(false);
-        setError(true);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-    );
-  }, []);
-
-  const getGeolocation = useCallback(async () => {
+  const fetchGeolocation = useCallback(async () => {
     await requestPermissions();
-    getCurrentPosition();
-  }, [getCurrentPosition, requestPermissions]);
+    await getGeolocation();
+  }, [requestPermissions, getGeolocation]);
 
   useEffect(() => {
-    getGeolocation();
-  }, [getGeolocation]);
+    if (!geolocation.latitude || !geolocation.longitude) {
+      fetchGeolocation();
+    }
+  }, [fetchGeolocation, geolocation.latitude, geolocation.longitude]);
 
-  return { geolocation, isLoading, isError, geocode, isGeocodeLoading, isGeocodeError, permissionStatus, getGeolocation };
+  return { geolocation, geocode, permissionStatus, isError: status === API_STATUS.FAILURE, getGeolocation };
 };
 
 export default useGeolocation;

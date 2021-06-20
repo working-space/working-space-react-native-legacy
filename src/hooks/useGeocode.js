@@ -20,6 +20,7 @@ const useGeocode = (geolocation) => {
       const dong = addressComponents.find((item) => item.order === 6);
 
       const address = `${city.name} ${district.name} ${dong.name}`;
+      console.log('useGeocode', address);
       setGeocode(address);
     } catch (error) {
       console.warn(error);
@@ -27,13 +28,11 @@ const useGeocode = (geolocation) => {
     } finally {
       setLoading(false);
     }
-  }, [geolocation.latitude, geolocation.longitude]);
+  }, [geolocation]);
 
   useEffect(() => {
-    if (geolocation.latitude && geolocation.longitude) {
-      getGeocode();
-    }
-  }, [geolocation.latitude, geolocation.longitude, getGeocode]);
+    getGeocode();
+  }, [getGeocode]);
 
   return {
     geocode,

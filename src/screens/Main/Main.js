@@ -18,7 +18,7 @@ import ErrorBox from '../../components/ErrorBox/ErrorBox';
 const Main = ({ navigation }) => {
   const { geolocation, getGeolocation, geocode, permissionStatus, isError: isGeolocationError } = useGeolocation();
 
-  const { cafeList, isLoading, size, setSize, isError } = useCafeList(geolocation);
+  const { cafeList, isLoading, isReachingEnd, size, setSize, isError } = useCafeList(geolocation);
 
   const [nowFilter, setNowFilter] = useState(FILTER.NEAREST.id);
   const [isSelectingFilter, setIsSelectingFilter] = useState(false);
@@ -114,11 +114,11 @@ const Main = ({ navigation }) => {
       <Container>
         <View>
           <SearchInput onPress={() => navigation.navigate('Search')}>
-            <SearchInput.PlaceHolder>현 위치 : {geocode}</SearchInput.PlaceHolder>
+            <SearchInput.PlaceHolder>현위치 : {geocode}</SearchInput.PlaceHolder>
           </SearchInput>
           <Animated.View style={{ opacity: fadeAnim, zIndex: 10 }}>
             <ScrolledListHeader>
-              <ScrolledListHeader.Text>현 위치에서 가장 {FILTER[nowFilter].name} 곳</ScrolledListHeader.Text>
+              <ScrolledListHeader.Text>현위치에서 가장 {FILTER[nowFilter].name} 곳</ScrolledListHeader.Text>
             </ScrolledListHeader>
           </Animated.View>
         </View>
@@ -165,7 +165,7 @@ const Main = ({ navigation }) => {
                 style={css`
                   margin-top: 20px;
                 `}>
-                <ActivityIndicator size="large" color="#e5e5e5" />
+                {!isReachingEnd && <ActivityIndicator size="large" color="#e5e5e5" />}
               </View>
             }
           />
