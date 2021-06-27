@@ -13,7 +13,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
           lon: longitude,
         },
       })
-      .then((res) => res.data),
+      .then((res) => res.data)
+      .catch((error) => {
+        console.warn(error);
+      }),
   );
 
   const cafeLikeCount = useSWR(['cafeLikeCount', cafeId], (_, cafeId) =>
@@ -23,7 +26,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
           cafe_id: cafeId,
         },
       })
-      .then((res) => res.data.count),
+      .then((res) => res.data.count)
+      .catch((error) => {
+        console.warn(error);
+      }),
   );
 
   const userPreferredTags = useSWR(['userPreferredTags', cafeId, userId], (_, cafeId, userId) =>
@@ -34,7 +40,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
           name: userId,
         },
       })
-      .then((res) => res.data.results),
+      .then((res) => res.data.results)
+      .catch((error) => {
+        console.warn(error);
+      }),
   );
   const userPreferredTagsData = userPreferredTags.data ?? [];
 
@@ -46,7 +55,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
           user_id: userId,
         },
       })
-      .then((res) => res.data.count),
+      .then((res) => res.data.count)
+      .catch((error) => {
+        console.warn(error);
+      }),
   );
 
   const userToggleBookmarkCount = useSWR(['userToggleBookmarkCount', userId], (_, userId) =>
@@ -57,7 +69,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
           user_id: userId,
         },
       })
-      .then((res) => res.data.count),
+      .then((res) => res.data.count)
+      .catch((error) => {
+        console.warn(error);
+      }),
   );
 
   const userCommentsData = useSWR(['userCommentsData', cafeId, userId], (_, cafeId, userId) =>
@@ -68,7 +83,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
           user_id: userId,
         },
       })
-      .then((res) => res.data.results),
+      .then((res) => res.data.results)
+      .catch((error) => {
+        console.warn(error);
+      }),
   );
 
   const isDetailCafeDataLoading =
@@ -81,13 +99,10 @@ export const useFetchDetailCafeData = (cafeId, userId, latitude, longitude) => {
     isCommentsLoading;
 
   const isDetailCafeDataValidating = detailCafeData.isValidating;
-  // cafeLikeCount.isValidating ||
-  // userPreferredTags.isValidating ||
-  // userToggleLikeCount.isValidating ||
-  // userToggleBookmarkCount.isValidating ||
-  // userCommentsData.isValidating;
 
-  const isDetailCafeDataError = detailCafeData.error || cafeLikeCount.error || userPreferredTags.error || userToggleLikeCount.error || userToggleBookmarkCount.error || userCommentsData.error;
+  const isFetchError = detailCafeData.error || cafeLikeCount.error || userPreferredTags.error || userToggleLikeCount.error || userToggleBookmarkCount.error || userCommentsData.error;
+  const isInvalidData = !isDetailCafeDataValidating && !detailCafeData.data?.name;
+  const isDetailCafeDataError = isFetchError || isInvalidData;
 
   return {
     detailCafeData,
@@ -122,8 +137,12 @@ export const useFetchCommentsList = (cafeId) => {
   );
 
   const commentsListData = useSWRInfinite(newCommentsListDataGetKey, async (url) => {
-    const { data } = await api.get(url);
-    return data;
+    try {
+      const { data } = await api.get(url);
+      return data;
+    } catch (error) {
+      console.warn(error);
+    }
   });
 
   const commentsData = commentsListData.data ?? [];

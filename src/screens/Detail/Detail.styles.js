@@ -5,6 +5,11 @@ export const DetailWrapper = styled.ScrollView`
   background-color: #ffffff;
 `;
 
+export const ErrorWrapper = styled.View`
+  flex: 1;
+  background-color: #ffffff;
+`;
+
 export const LinkIconWrapper = styled.View`
   flex-direction: row;
   align-items: center;
