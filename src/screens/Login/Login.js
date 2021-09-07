@@ -14,7 +14,7 @@ const Login = ({ navigation }) => {
       const profile = await getKakaoProfile();
       await navigation.navigate('Signup', { token: token.accessToken, name: profile.nickname, profileImageUrl: profile.profileImageUrl });
     } catch (error) {
-      console.error(error);
+      console.warn(error);
     }
   };
 
@@ -29,12 +29,12 @@ const Login = ({ navigation }) => {
           </LoginButton.Icon>
           <LoginButton.Text>카카오 로그인</LoginButton.Text>
         </LoginButton>
-        <LoginButton>
+        {/* <LoginButton>
           <LoginButton.Icon>
             <GoogleButtonIcon />
           </LoginButton.Icon>
           <LoginButton.Text>구글 로그인</LoginButton.Text>
-        </LoginButton>
+        </LoginButton> */}
       </Footer>
     </Container>
   );

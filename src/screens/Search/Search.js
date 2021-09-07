@@ -19,13 +19,13 @@ const Search = ({ navigation }) => {
   const [searchType, setSearchType] = useState('location');
   const [isFocusing, setFocusing] = useState(false);
 
-  const debouncedSearchKeyword = useDebounce(searchKeyword, 500);
+  const debouncedSearchKeyword = useDebounce(searchKeyword, 100);
 
-  const { cafeList = [], isLoading, isReachingEnd, isError, size, setSize } = useCafeList(geolocation, { searchKeyword: debouncedSearchKeyword, searchType });
+  const { cafeList, isLoading, isReachingEnd, isError, size, setSize } = useCafeList(geolocation, { searchKeyword: debouncedSearchKeyword, searchType });
 
   const isTyping = useMemo(() => {
-    return searchKeyword.trim() !== '';
-  }, [searchKeyword]);
+    return debouncedSearchKeyword.trim() !== '';
+  }, [debouncedSearchKeyword]);
 
   const handleNavigateCafeDetail = (cafe) => {
     navigation.navigate('Detail', { cafeId: cafe.id });
@@ -81,8 +81,9 @@ const Search = ({ navigation }) => {
         {debouncedSearchKeyword ? (
           <FlatList
             contentContainerStyle={css`
-              margin: 0 16px;
-              padding: 24px 0;
+              flex: 1;
+              padding: 24px 16px;
+              ${cafeList.length === 0 && 'background-color: #fafafa;'}
             `}
             data={cafeList}
             keyExtractor={(item) => item.id}
@@ -102,19 +103,26 @@ const Search = ({ navigation }) => {
             onEndReached={handleAdditionalLoad}
             onEndReachedThreshold={0.2}
             ListEmptyComponent={
-              cafeList.length === 0 &&
-              !isLoading && (
-                <SearchGuide>
-                  <SearchGuide.Text>검색 결과가 없습니다</SearchGuide.Text>
-                </SearchGuide>
-              )
+              <>
+                {isError && (
+                  <ErrorBox>
+                    <ErrorBox.Heading>앗!</ErrorBox.Heading>
+                    <ErrorBox.Message>검색 결과를 불러오지 못했어요!{'\n'}잠시 후에 다시 시도해주세요</ErrorBox.Message>
+                  </ErrorBox>
+                )}
+                {!isLoading && !isError && (
+                  <SearchGuide>
+                    <SearchGuide.Text>검색 결과가 없습니다</SearchGuide.Text>
+                  </SearchGuide>
+                )}
+              </>
             }
             ListFooterComponent={
               <View
                 style={css`
                   margin-top: 20px;
                 `}>
-                {!isReachingEnd && <ActivityIndicator size="large" color="#e5e5e5" />}
+                {!isError && !isReachingEnd && <ActivityIndicator size="large" color="#e5e5e5" />}
               </View>
             }
           />
@@ -134,12 +142,6 @@ const Search = ({ navigation }) => {
                 <SearchGuide.Text>검색하고 싶은 카페의 상호명을 입력해주세요.</SearchGuide.Text>
                 <SearchGuide.Text small>예) 테라로사 커피, 스타벅스 강남역점</SearchGuide.Text>
               </SearchGuide>
-            )}
-            {isError && (
-              <ErrorBox>
-                <ErrorBox.Heading>앗!</ErrorBox.Heading>
-                <ErrorBox.Message>검색 결과를 불러오지 못했어요!{'\n'}잠시 후에 다시 시도해주세요</ErrorBox.Message>
-              </ErrorBox>
             )}
           </ResultList>
         )}

@@ -17,6 +17,16 @@ TextButton.Text = styled.Text`
   color: #000;
 `;
 
+TextButton.Link = styled.TouchableOpacity`
+  margin-top: 5px;
+`;
+
+TextButton.LinkText = styled.Text`
+  font-size: 14px;
+  color: #a7a7a7;
+  text-decoration-line: underline;
+`;
+
 export const Line = styled.View`
   width: 100%;
   height: 0;

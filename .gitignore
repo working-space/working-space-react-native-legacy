@@ -60,3 +60,5 @@ buck-out/
 
 .env*
 android/*.hprof
+
+constants/terms.js

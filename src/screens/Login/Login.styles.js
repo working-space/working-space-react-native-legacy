@@ -18,6 +18,7 @@ export const HeaderText = styled.Text`
 export const Footer = styled.View`
   width: 100%;
   padding: 16px 16px 4px 16px;
+  margin-bottom: 16px;
 `;
 
 export const LoginButton = styled.TouchableOpacity`

@@ -9,6 +9,7 @@ import Comments from '~/screens/UserMenu/Comments/Comments';
 import Bookmarks from '~/screens/UserMenu/Bookmarks/Bookmarks';
 import Settings from '~/screens/UserMenu/Settings/Settings';
 import Detail from '~/screens/Detail/Detail';
+import Terms from '~/screens/UserMenu/Settings/Terms';
 
 const Stack = createStackNavigator();
 
@@ -82,6 +83,14 @@ const MainNavigator = () => {
       <Stack.Screen
         name="Settings"
         component={Settings}
+        options={{
+          headerShown: false,
+          headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="Terms"
+        component={Terms}
         options={{
           headerShown: false,
           headerBackTitleVisible: false,

@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 import { useFetchDetailCafeData, useFetchCommentsList } from '~hooks/useDetailData';
 import api from '../../api';
 
-import { DetailWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
+import { DetailWrapper, ErrorWrapper, LinkIconWrapper, ModalEvaluation } from './Detail.styles';
 import Header from '~/components/Header/Header';
 import DetailTitle from '~/components/DetailInfo/DetailTitle';
 import DetailInfo from '~/components/DetailInfo/DetailInfo';
@@ -29,7 +29,7 @@ import useSelectedTags from '../../hooks/useSelectedTags';
 import ErrorBox from '../../components/ErrorBox/ErrorBox';
 import useGeolocation from '../../hooks/useGeolocation';
 
-const Detail = ({ userId, route, navigation: { goBack } }) => {
+const Detail = ({ userId, route, navigation }) => {
   const { cafeId } = route.params;
 
   const { geolocation } = useGeolocation();
@@ -49,7 +49,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
 
   const { comments, commentsListData, hasNextComments, isCommentsLoading, isCommentsError } = useFetchCommentsList(cafeId);
   const [visibleInput, setVisibleInput] = useState(null);
-  const [preferredTags, setpreferredTags] = useState(userPreferredTagsData);
+  const [preferredTags, setPreferredTags] = useState(userPreferredTagsData);
   const [currentCommentId, setCurrentCommentId] = useState(null);
   const { selectedTags, setSelectedTags, toggleTag } = useSelectedTags(userPreferredTagsData);
   const inputRef = useRef(null);
@@ -132,7 +132,7 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
 
   const handleSubmitBtn = () => {
     setVisibleInput(null);
-    setpreferredTags([...selectedTags]);
+    setPreferredTags([...selectedTags]);
   };
 
   const handleCloseBtn = useCallback(() => {
@@ -143,10 +143,20 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
 
   if (isDetailCafeDataError || isCommentsError) {
     return (
-      <ErrorBox>
-        <ErrorBox.Heading>앗!</ErrorBox.Heading>
-        <ErrorBox.Message>카페 정보를 불러오지 못했어요!</ErrorBox.Message>
-      </ErrorBox>
+      <ErrorWrapper>
+        <Header
+          showBorderBottom={true}
+          left={
+            <Header.Button onPress={() => navigation.goBack()}>
+              <BackIcon />
+            </Header.Button>
+          }
+        />
+        <ErrorBox>
+          <ErrorBox.Heading>앗!</ErrorBox.Heading>
+          <ErrorBox.Message>카페 정보를 불러오지 못했어요!</ErrorBox.Message>
+        </ErrorBox>
+      </ErrorWrapper>
     );
   }
 
@@ -154,14 +164,14 @@ const Detail = ({ userId, route, navigation: { goBack } }) => {
     return <LoadingBar />;
   }
 
-  const [cafeLongitude, cafeLatitude] = detailCafeData.data.location.coordinates;
+  const [cafeLongitude, cafeLatitude] = detailCafeData.data?.location.coordinates;
 
   return (
     <>
       <Header
         showBorderBottom={true}
         left={
-          <Header.Button onPress={() => goBack()}>
+          <Header.Button onPress={() => navigation.goBack()}>
             <BackIcon />
           </Header.Button>
         }
