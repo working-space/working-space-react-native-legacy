@@ -17,8 +17,9 @@ yarn run android
 - [MobX 6](https://github.com/mobxjs/mobx)
   - 데코레이터 문법은 사용하지 않는다.
 - [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite)
+- [SWR](https://swr.vercel.app/)
 - [react-native-config](https://github.com/luggit/react-native-config)
-- [react-native-naver-map](https://github.com/QuadFlask/react-native-naver-map)
+- [react-native-maps](https://github.com/react-native-maps/react-native-maps)
 
 ## 팁
 
